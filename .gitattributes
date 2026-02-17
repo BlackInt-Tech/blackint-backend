@@ -1,2 +1,6 @@
+# Normalize line endings
+* text=auto
+
+# Maven wrapper
 /mvnw text eol=lf
 *.cmd text eol=crlf
