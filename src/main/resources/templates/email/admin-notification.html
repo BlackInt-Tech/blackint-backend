@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>New Lead</title>
+</head>
+<body style="font-family:Arial;background:#f5f5f5;padding:40px;">
+
+<div style="max-width:600px;margin:auto;background:#ffffff;padding:30px;border-radius:10px;box-shadow:0 8px 25px rgba(0,0,0,0.08);">
+
+<h2 style="color:#000;">🚀 New Lead Received</h2>
+
+<p><strong>Name:</strong> <span th:text="${name}"></span></p>
+<p><strong>Email:</strong> <span th:text="${email}"></span></p>
+<p><strong>Phone:</strong> <span th:text="${phone}"></span></p>
+<p><strong>Subject:</strong> <span th:text="${subject}"></span></p>
+
+<hr style="margin:20px 0;">
+
+<p><strong>Message:</strong></p>
+<p th:text="${message}" style="color:#444;"></p>
+
+</div>
+
+</body>
+</html>
