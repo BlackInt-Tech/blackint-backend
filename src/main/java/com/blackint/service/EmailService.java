@@ -1,5 +1,6 @@
 package com.blackint.service;
 
+import org.springframework.context.annotation.Profile;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.thymeleaf.context.Context;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Profile({"dev", "prod"}) 
 public class EmailService {
 
     private final JavaMailSender mailSender;
