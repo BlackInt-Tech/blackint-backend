@@ -49,6 +49,8 @@ public class SecurityConfig {
 
                         // ================= AUTH =================
                         .requestMatchers("/api/auth/**").permitAll()
+                        
+                        .requestMatchers("/", "/health").permitAll()
 
                         // ================= SWAGGER =================
                         .requestMatchers(
