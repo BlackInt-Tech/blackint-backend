@@ -3,6 +3,7 @@ package com.blackint.service;
 import com.blackint.entity.AdminUser;
 import com.blackint.entity.RefreshToken;
 import com.blackint.repository.RefreshTokenRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +13,12 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private final RefreshTokenRepository repository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
+    @Transactional
     public RefreshToken createRefreshToken(AdminUser user, String token) {
 
-        repository.deleteByAdminUser_Id(user.getId()); // one active token per user
+        refreshTokenRepository.deleteByAdminUser_Id(user.getId());
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(token)
@@ -25,26 +27,28 @@ public class RefreshTokenService {
                 .revoked(false)
                 .build();
 
-        return repository.save(refreshToken);
+         return refreshTokenRepository.save(refreshToken);
     }
 
+    @Transactional
     public RefreshToken validateToken(String token) {
 
-        RefreshToken refreshToken = repository.findByToken(token)
+        RefreshToken stored = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
-        if (refreshToken.getRevoked() ||
-            refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (stored.getRevoked() || stored.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Refresh token expired or revoked");
         }
 
-        return refreshToken;
+        return stored;
     }
 
+    @Transactional
     public void revoke(String token) {
-        repository.findByToken(token).ifPresent(rt -> {
-            rt.setRevoked(true);
-            repository.save(rt);
-        });
+        RefreshToken stored = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+
+        stored.setRevoked(true);
+        refreshTokenRepository.save(stored);
     }
 }
