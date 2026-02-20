@@ -8,91 +8,144 @@ import com.blackint.exception.ResourceNotFoundException;
 import com.blackint.exception.SlugAlreadyExistsException;
 import com.blackint.mapper.ProjectMapper;
 import com.blackint.repository.ProjectRepository;
+import com.blackint.utils.IdGenerator;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
 
-    private final ProjectRepository repository;
+    private final ProjectRepository projectRepository;
+    private final IdGenerator idGenerator;
 
+    // ================= CREATE =================
+    @Transactional
     public ProjectResponse create(ProjectRequest request) {
 
-        repository.findBySlug(request.getSlug())
-                .ifPresent(p -> {
-                    throw new SlugAlreadyExistsException("Slug already exists");
-                });
+        if (projectRepository.existsBySlug(request.getSlug())) {
+            throw new SlugAlreadyExistsException("Slug already exists");
+        }
 
         Project project = ProjectMapper.toEntity(request);
 
-        return ProjectMapper.toResponse(repository.save(project));
+        project.setPublicId(idGenerator.generate("PROJ"));
+        project.setStatus(ProjectStatus.DRAFT);
+        project.setIsDeleted(false);
+        project.setCreatedAt(LocalDateTime.now());
+
+        return ProjectMapper.toResponse(projectRepository.save(project));
     }
 
-    public ProjectResponse update(UUID id, ProjectRequest request) {
+    // ================= UPDATE =================
+    @Transactional
+    public ProjectResponse update(String publicId, ProjectRequest request) {
 
-        Project project = repository.findById(id)
+        Project project = projectRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        // Slug validation only if changed
+        if (!project.getSlug().equals(request.getSlug())
+                && projectRepository.existsBySlug(request.getSlug())) {
+            throw new SlugAlreadyExistsException("Slug already exists");
+        }
 
         project.setTitle(request.getTitle());
         project.setSlug(request.getSlug());
         project.setShortDescription(request.getShortDescription());
         project.setFullContent(request.getFullContent());
+        project.setFeaturedImage(request.getFeaturedImage());
+        project.setClientName(request.getClientName());
+        project.setProjectUrl(request.getProjectUrl());
+        project.setIsFeatured(request.getIsFeatured());
+        project.setSeoTitle(request.getSeoTitle());
+        project.setSeoDescription(request.getSeoDescription());
         project.setUpdatedAt(LocalDateTime.now());
 
-        return ProjectMapper.toResponse(repository.save(project));
+        return ProjectMapper.toResponse(projectRepository.save(project));
     }
 
-    public void softDelete(UUID id) {
-        Project project = repository.findById(id)
+    // ================= SOFT DELETE =================
+    @Transactional
+    public void softDelete(String publicId) {
+
+        Project project = projectRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
         project.setIsDeleted(true);
-        repository.save(project);
+        project.setUpdatedAt(LocalDateTime.now());
     }
 
-    public void restore(UUID id) {
-        Project project = repository.findById(id)
+    // ================= RESTORE =================
+    @Transactional
+    public void restore(String publicId) {
+
+        Project project = projectRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
         project.setIsDeleted(false);
-        repository.save(project);
+        project.setUpdatedAt(LocalDateTime.now());
     }
 
-    public ProjectResponse publish(UUID id) {
-        Project project = repository.findById(id)
+    // ================= PUBLISH =================
+    @Transactional
+    public ProjectResponse publish(String publicId) {
+
+        Project project = projectRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
         project.setStatus(ProjectStatus.PUBLISHED);
         project.setPublishedAt(LocalDateTime.now());
+        project.setUpdatedAt(LocalDateTime.now());
 
-        return ProjectMapper.toResponse(repository.save(project));
+        return ProjectMapper.toResponse(project);
     }
 
+    // ================= UNPUBLISH =================
+    @Transactional
+    public ProjectResponse unpublish(String publicId) {
+
+        Project project = projectRepository.findByPublicId(publicId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        project.setStatus(ProjectStatus.DRAFT);
+        project.setPublishedAt(null);
+        project.setUpdatedAt(LocalDateTime.now());
+
+        return ProjectMapper.toResponse(project);
+    }
+
+    // ================= PUBLIC =================
     public List<ProjectResponse> getPublished() {
-        return repository.findByStatusAndIsDeletedFalse(ProjectStatus.PUBLISHED)
-                .stream()
-                .map(ProjectMapper::toResponse)
-                .collect(Collectors.toList());
-    }
 
-    public List<ProjectResponse> getAllForAdmin() {
-        return repository.findAll()
+        return projectRepository
+                .findByStatusAndIsDeletedFalse(ProjectStatus.PUBLISHED)
                 .stream()
                 .map(ProjectMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     public ProjectResponse getBySlug(String slug) {
-        Project project = repository
+
+        Project project = projectRepository
                 .findBySlugAndStatusAndIsDeletedFalse(slug, ProjectStatus.PUBLISHED)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
         return ProjectMapper.toResponse(project);
+    }
+
+    // ================= ADMIN =================
+    public List<ProjectResponse> getAllForAdmin() {
+
+        return projectRepository.findAll()
+                .stream()
+                .map(ProjectMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

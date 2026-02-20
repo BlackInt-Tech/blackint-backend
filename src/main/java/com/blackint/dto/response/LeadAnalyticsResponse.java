@@ -12,5 +12,7 @@ public class LeadAnalyticsResponse {
     private long newLeads;
     private long contactedLeads;
     private long convertedLeads;
+    private Long todayLeads;
+    private Long monthLeads;
 }
 

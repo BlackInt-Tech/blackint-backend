@@ -34,21 +34,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        String email = null;
-        String token = null;
-
-        // Check Bearer token
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            email = jwtService.extractEmail(token);
+        // If no header OR not Bearer → just continue
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // Authenticate if valid
+        String token = authHeader.substring(7);
+        String email = null;
+
+        try {
+            email = jwtService.extractEmail(token);
+        } catch (Exception e) {
+            // Never break request for invalid token
+            log.warn("Invalid or malformed JWT: {}", e.getMessage());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Authenticate only if valid and not already authenticated
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            if (email.equals(userDetails.getUsername())) {
+            if (jwtService.isTokenValid(token, userDetails)) {
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(

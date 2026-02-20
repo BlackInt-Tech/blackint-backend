@@ -1,25 +1,24 @@
 package com.blackint.service;
 
-import com.blackint.dto.request.ContactRequest;
 import com.blackint.common.ApiResponse;
+import com.blackint.dto.request.ContactRequest;
 import com.blackint.dto.response.ContactResponse;
 import com.blackint.dto.response.LeadAnalyticsResponse;
+import com.blackint.email.EmailService;
 import com.blackint.entity.Contact;
 import com.blackint.entity.LeadStatus;
 import com.blackint.exception.ResourceNotFoundException;
 import com.blackint.mapper.ContactMapper;
 import com.blackint.repository.ContactRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,50 +28,35 @@ public class ContactService {
     private final ContactRepository repository;
     private final EmailService emailService;
 
-    /**
-     * Public Lead Submission
-     */
-    public ApiResponse<Void> submit(ContactRequest request) {
+    // ================= PUBLIC SUBMIT =================
 
-        Contact contact = ContactMapper.toEntity(request);
+    public ApiResponse<Void> submit(ContactRequest request, String ip) {
+
+        
+        Contact contact = ContactMapper.toEntity(
+                request,
+                ip,
+                "WEBSITE"
+        );
+
         repository.save(contact);
 
-        // Async Emails
-        try {
-        emailService.sendUserConfirmation(
-                request.getEmail(),
-                request.getFullName()
+        emailService.sendLeadSubmissionEmail(contact);
+        emailService.sendAdminNotification(contact);
+
+        return ApiResponse.successMessage(
+                "Thank you! Our team will contact you shortly."
         );
-
-        emailService.notifyAdmin(
-                request.getFullName(),
-                request.getEmail(),
-                request.getPhone(),
-                request.getSubject(),
-                request.getMessage()
-        );
-
-        } catch (Exception e) {
-        log.error("Email sending failed for {}", request.getEmail(), e);
-        }
-
-        log.info("Lead Created | email={} | phone={} | subject={}",
-        contact.getEmail(),
-        contact.getPhone(),
-        contact.getSubject());
-
-        return ApiResponse.<Void>builder()
-                .success(true)
-                .message("Thank you for contacting BlackInt. Our team will reach out soon.")
-                .data(null)
-                .timestamp(LocalDateTime.now())
-                .build();
     }
 
-    /**
-     * Admin: Get All Active Leads
-     */
-    public ApiResponse<Page<ContactResponse>> getAll(int page, int size) {
+    // ================= ADMIN FETCH =================
+
+    public ApiResponse<Page<ContactResponse>> getAll(
+            int page,
+            int size,
+            LeadStatus status,
+            String search
+    ) {
 
         Pageable pageable = PageRequest.of(
                 page,
@@ -80,78 +64,100 @@ public class ContactService {
                 Sort.by("createdAt").descending()
         );
 
-        Page<Contact> contactPage = repository.findByIsDeletedFalse(pageable);
+        Page<Contact> result;
 
-        Page<ContactResponse> responsePage =
-                contactPage.map(ContactMapper::toResponse);
+        if (status != null) {
+            result = repository.findByIsDeletedFalseAndStatus(status, pageable);
 
-        return ApiResponse.<Page<ContactResponse>>builder()
-                .success(true)
-                .message("Leads fetched successfully")
-                .data(responsePage)
-                .timestamp(LocalDateTime.now())
-                .build();
+        } else if (search != null && !search.isBlank()) {
+            result = repository
+                    .findByIsDeletedFalseAndFullNameContainingIgnoreCaseOrIsDeletedFalseAndEmailContainingIgnoreCase(
+                            search,
+                            search,
+                            pageable
+                    );
+        } else {
+            result = repository.findByIsDeletedFalse(pageable);
         }
 
-    /**
-     * Admin: Update Lead Status
-     */
-    public ApiResponse<Void> updateStatus(UUID id, LeadStatus status) {
+        return ApiResponse.success(
+                result.map(ContactMapper::toResponse)
+        );
+    }
 
-        Contact contact = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Lead not found"));
+    // ================= UPDATE STATUS =================
+
+    public ApiResponse<Void> updateStatus(
+            String publicId,
+            LeadStatus status
+    ) {
+
+        Contact contact = repository.findByPublicId(publicId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Lead not found"));
 
         contact.setStatus(status);
         contact.setUpdatedAt(LocalDateTime.now());
+
         repository.save(contact);
 
-        log.info("Lead Status Updated | id={} | newStatus={}", id, status);
+        log.info("Lead Status Updated | publicId={} | status={}",
+                publicId,
+                status
+        );
+        emailService.sendLeadStatusUpdateEmail(contact);
 
-
-        return ApiResponse.<Void>builder()
-                .success(true)
-                .message("Lead status updated successfully")
-                .data(null)
-                .timestamp(LocalDateTime.now())
-                .build();
+        return ApiResponse.successMessage("Lead status updated successfully");
     }
 
-    /**
-     * Admin: Soft Delete Lead
-     */
-    public ApiResponse<Void> delete(UUID id) {
+    // ================= SOFT DELETE =================
 
-        Contact contact = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Lead not found"));
+    public ApiResponse<Void> delete(String publicId) {
+
+        Contact contact = repository.findByPublicId(publicId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Lead not found"));
 
         contact.setIsDeleted(true);
         contact.setUpdatedAt(LocalDateTime.now());
+
         repository.save(contact);
 
-        log.warn("Lead Soft Deleted | id={}", id);
+        log.warn("Lead Soft Deleted | publicId={}", publicId);
 
-        return ApiResponse.<Void>builder()
-                .success(true)
-                .message("Lead deleted successfully")
-                .data(null)
-                .timestamp(LocalDateTime.now())
-                .build();
+        return ApiResponse.successMessage("Lead deleted successfully");
     }
+
+    // ================= ANALYTICS =================
 
     public ApiResponse<LeadAnalyticsResponse> getAnalytics() {
 
-    LeadAnalyticsResponse analytics = LeadAnalyticsResponse.builder()
-            .totalLeads(repository.countByIsDeletedFalse())
-            .newLeads(repository.countByStatus(LeadStatus.NEW))
-            .contactedLeads(repository.countByStatus(LeadStatus.CONTACTED))
-            .convertedLeads(repository.countByStatus(LeadStatus.CONVERTED))
-            .build();
+        LocalDateTime todayStart =
+                LocalDate.now().atStartOfDay();
 
-    return ApiResponse.<LeadAnalyticsResponse>builder()
-            .success(true)
-            .message("Analytics fetched successfully")
-            .data(analytics)
-            .timestamp(LocalDateTime.now())
-            .build();
-}
+        LocalDateTime monthStart =
+                LocalDate.now().withDayOfMonth(1).atStartOfDay();
+
+        long total = repository.countByIsDeletedFalse();
+        long newLeads = repository.countByIsDeletedFalseAndStatus(LeadStatus.NEW);
+        long contacted = repository.countByIsDeletedFalseAndStatus(LeadStatus.CONTACTED);
+        long converted = repository.countByIsDeletedFalseAndStatus(LeadStatus.CONVERTED);
+
+        long todayLeads =
+                repository.countByIsDeletedFalseAndCreatedAtAfter(todayStart);
+
+        long monthLeads =
+                repository.countByIsDeletedFalseAndCreatedAtAfter(monthStart);
+
+        LeadAnalyticsResponse analytics = LeadAnalyticsResponse.builder()
+                .totalLeads(total)
+                .newLeads(newLeads)
+                .contactedLeads(contacted)
+                .convertedLeads(converted)
+                .todayLeads(todayLeads)
+                .monthLeads(monthLeads)
+                .build();
+
+        return ApiResponse.success(analytics);
+    }
 }

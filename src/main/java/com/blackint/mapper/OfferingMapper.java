@@ -32,7 +32,7 @@ public class OfferingMapper {
     public static OfferingResponse toResponse(Offering service) {
 
         return OfferingResponse.builder()
-                .id(service.getId())
+                .publicId(service.getPublicId())
                 .title(service.getTitle())
                 .slug(service.getSlug())
                 .shortDescription(service.getShortDescription())

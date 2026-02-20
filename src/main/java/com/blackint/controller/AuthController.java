@@ -1,9 +1,9 @@
 package com.blackint.controller;
 
+import com.blackint.common.ApiResponse;
 import com.blackint.dto.request.AuthRequest;
 import com.blackint.dto.request.RefreshTokenRequest;
 import com.blackint.dto.request.RegisterRequest;
-import com.blackint.dto.response.ApiResponse;
 import com.blackint.dto.response.AuthResponse;
 import com.blackint.dto.response.RegisterResponse;
 import com.blackint.service.AuthService;

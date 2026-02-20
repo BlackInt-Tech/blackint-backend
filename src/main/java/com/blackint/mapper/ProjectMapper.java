@@ -32,7 +32,7 @@ public class ProjectMapper {
     public static ProjectResponse toResponse(Project project) {
 
         return ProjectResponse.builder()
-                .id(project.getId())
+                .publicId(project.getPublicId())
                 .title(project.getTitle())
                 .slug(project.getSlug())
                 .shortDescription(project.getShortDescription())
