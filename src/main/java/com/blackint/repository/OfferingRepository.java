@@ -12,6 +12,8 @@ public interface OfferingRepository extends JpaRepository<Offering, UUID> {
 
     Optional<Offering> findBySlug(String slug);
 
+    Optional<Offering> findByPublicId(String publicId);
+
     Optional<Offering> findBySlugAndStatusAndIsDeletedFalse(
             String slug,
             OfferingStatus status
@@ -21,3 +23,4 @@ public interface OfferingRepository extends JpaRepository<Offering, UUID> {
 
     List<Offering> findByIsDeletedFalse();
 }
+

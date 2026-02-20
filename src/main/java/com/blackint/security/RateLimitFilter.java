@@ -1,6 +1,6 @@
 package com.blackint.security;
 
-import com.blackint.dto.response.ApiResponse;
+import com.blackint.common.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

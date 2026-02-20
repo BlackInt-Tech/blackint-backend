@@ -7,7 +7,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "contacts")
+@Table(
+    name = "contacts",
+    indexes = {
+        @Index(name = "idx_contact_email", columnList = "email"),
+        @Index(name = "idx_contact_status", columnList = "status"),
+        @Index(name = "idx_contact_created_at", columnList = "createdAt")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +25,9 @@ public class Contact {
     @Id
     @GeneratedValue
     private UUID id;
+
+    @Column(name = "public_id", unique = true, nullable = false, length = 32)
+    private String publicId;
 
     @Column(nullable = false)
     private String fullName;
@@ -35,6 +45,9 @@ public class Contact {
 
     @Enumerated(EnumType.STRING)
     private LeadStatus status;
+
+    private String source;
+    private String ipAddress;
 
     private Boolean isDeleted = false;
 

@@ -1,59 +1,85 @@
 package com.blackint.controller;
 
+import com.blackint.common.ApiResponse;
 import com.blackint.dto.request.OfferingRequest;
 import com.blackint.dto.response.OfferingResponse;
 import com.blackint.service.OfferingService;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/offering")
+@RequestMapping("/api/offerings")
 @RequiredArgsConstructor
 public class OfferingController {
 
     private final OfferingService service;
 
+    // ================= ADMIN CREATE =================
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public OfferingResponse create(@RequestBody OfferingRequest request) {
-        return service.create(request);
+    public ApiResponse<OfferingResponse> create(
+            @RequestBody OfferingRequest request
+    ) {
+        return ApiResponse.success(service.create(request));
     }
 
-    @PutMapping("/{id}")
-    public OfferingResponse update(@PathVariable UUID id,
-                                  @RequestBody OfferingRequest request) {
-        return service.update(id, request);
+    // ================= ADMIN UPDATE =================
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{publicId}")
+    public ApiResponse<OfferingResponse> update(
+            @PathVariable String publicId,
+            @RequestBody OfferingRequest request
+    ) {
+        return ApiResponse.success(service.update(publicId, request));
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-        service.softDelete(id);
+    // ================= ADMIN DELETE =================
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{publicId}")
+    public ApiResponse<Void> delete(@PathVariable String publicId) {
+        service.softDelete(publicId);
+        return ApiResponse.success(null);
     }
 
-    @PutMapping("/{id}/restore")
-    public void restore(@PathVariable UUID id) {
-        service.restore(id);
+    // ================= ADMIN RESTORE =================
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{publicId}/restore")
+    public ApiResponse<Void> restore(@PathVariable String publicId) {
+        service.restore(publicId);
+        return ApiResponse.success(null);
     }
 
-    @PutMapping("/{id}/publish")
-    public OfferingResponse publish(@PathVariable UUID id) {
-        return service.publish(id);
+    // ================= ADMIN PUBLISH =================
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{publicId}/publish")
+    public ApiResponse<OfferingResponse> publish(
+            @PathVariable String publicId
+    ) {
+        return ApiResponse.success(service.publish(publicId));
     }
 
+    // ================= PUBLIC =================
     @GetMapping("/published")
-    public List<OfferingResponse> getPublished() {
-        return service.getPublished();
+    public ApiResponse<List<OfferingResponse>> getPublished() {
+        return ApiResponse.success(service.getPublished());
     }
 
     @GetMapping("/{slug}")
-    public OfferingResponse getBySlug(@PathVariable String slug) {
-        return service.getBySlug(slug);
+    public ApiResponse<OfferingResponse> getBySlug(
+            @PathVariable String slug
+    ) {
+        return ApiResponse.success(service.getBySlug(slug));
     }
 
+    // ================= ADMIN VIEW ALL =================
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/all")
-    public List<OfferingResponse> getAllForAdmin() {
-        return service.getAllForAdmin();
+    public ApiResponse<List<OfferingResponse>> getAllForAdmin() {
+        return ApiResponse.success(service.getAllForAdmin());
     }
 }

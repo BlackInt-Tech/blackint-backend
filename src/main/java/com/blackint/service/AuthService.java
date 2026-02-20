@@ -1,8 +1,8 @@
 package com.blackint.service;
 
+import com.blackint.common.ApiResponse;
 import com.blackint.dto.request.AuthRequest;
 import com.blackint.dto.request.RegisterRequest;
-import com.blackint.dto.response.ApiResponse;
 import com.blackint.dto.response.AuthResponse;
 import com.blackint.dto.response.RegisterResponse;
 import com.blackint.entity.AdminUser;

@@ -7,7 +7,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "services")
+@Table(
+    name = "offerings",
+    indexes = {
+        @Index(name = "idx_offering_slug", columnList = "slug"),
+        @Index(name = "idx_offering_status", columnList = "status"),
+        @Index(name = "idx_offering_featured", columnList = "is_featured")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +25,9 @@ public class Offering {
     @Id
     @GeneratedValue
     private UUID id;
+
+    @Column(nullable = false, unique = true, length = 20)
+    private String publicId;
 
     @Column(nullable = false)
     private String title;
@@ -34,11 +44,14 @@ public class Offering {
     private String featuredImage;
     private String price;
 
-    private Boolean isFeatured;
-    private Boolean isDeleted;
+    @Column(name = "is_featured")
+    private Boolean isFeatured = false;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
 
     @Enumerated(EnumType.STRING)
-    private OfferingStatus status;
+    private OfferingStatus status = OfferingStatus.DRAFT;
 
     private String seoTitle;
     private String seoDescription;
@@ -46,4 +59,18 @@ public class Offering {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime publishedAt;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.isDeleted = false;
+        this.status = OfferingStatus.DRAFT;
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
+
