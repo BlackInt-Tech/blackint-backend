@@ -26,8 +26,8 @@ public class BlogController {
     // PUBLIC APIs
     // ==============================
 
-    // GET /api/blogs
-    @GetMapping
+    //get all published blog
+    @GetMapping("/published")
     public Page<BlogResponse> getPublished(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -35,13 +35,13 @@ public class BlogController {
         return blogService.getPublished(page, size);
     }
 
-    // GET /api/blogs/{slug}
-    @GetMapping("/{slug}")
+    //get blog by slug
+    @GetMapping("/slug/{slug}")
     public BlogResponse getBySlug(@PathVariable String slug) {
         return blogService.getBySlug(slug);
     }
 
-    // GET /api/blogs/featured
+    //get featured blog
     @GetMapping("/featured")
     public Page<BlogResponse> getFeatured(
             @RequestParam(defaultValue = "0") int page,
@@ -50,7 +50,7 @@ public class BlogController {
         return blogService.getFeatured(page, size);
     }
 
-    // GET /api/blogs/category/{slug}
+    //get blog by category
     @GetMapping("/category/{slug}")
     public Page<BlogResponse> getByCategory(
             @PathVariable String slug,
@@ -60,7 +60,7 @@ public class BlogController {
         return blogService.getByCategory(slug, page, size);
     }
 
-    // GET /api/blogs/tag/{slug}
+    //get blog by tag
     @GetMapping("/tag/{slug}")
     public Page<BlogResponse> getByTag(
             @PathVariable String slug,
@@ -74,15 +74,15 @@ public class BlogController {
     // ADMIN APIs
     // ==============================
 
-    // POST /api/admin/blogs
-    @PostMapping("/admin")
+    //Admin create blog
+    @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public BlogResponse create(@Valid @RequestBody CreateBlogRequest request) {
         return blogService.create(request);
     }
 
-    // PUT /api/admin/blogs/{id}
-    @PutMapping("/admin/{id}")
+    //Admin update blog
+    @PutMapping("/update/{publicId}")
     @PreAuthorize("hasRole('ADMIN')")
     public BlogResponse update(
             @PathVariable UUID id,
@@ -91,15 +91,15 @@ public class BlogController {
         return blogService.update(id, request);
     }
 
-    // PUT /api/admin/blogs/{id}/publish
-    @PutMapping("/admin/{id}/publish")
+    //Admin publish project
+    @PutMapping("/publish/{publicId}")
     @PreAuthorize("hasRole('ADMIN')")
     public BlogResponse publish(@PathVariable UUID id) {
         return blogService.changeStatus(id, BlogStatus.PUBLISHED, null);
     }
 
-    // PUT /api/admin/blogs/{id}/schedule
-    @PutMapping("/admin/{id}/schedule")
+    //Admin schedule blog
+    @PutMapping("/schedule/{publicId}")
     @PreAuthorize("hasRole('ADMIN')")
     public BlogResponse schedule(
             @PathVariable UUID id,
@@ -108,8 +108,8 @@ public class BlogController {
         return blogService.changeStatus(id, BlogStatus.SCHEDULED, scheduledAt);
     }
 
-    // DELETE /api/admin/blogs/{id}
-    @DeleteMapping("/admin/{id}")
+    // Admin delete blog
+    @DeleteMapping("/delete/{publicId}")
     @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable UUID id) {
         blogService.softDelete(id);
