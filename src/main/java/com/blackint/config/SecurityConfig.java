@@ -90,9 +90,10 @@ public class SecurityConfig {
         public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
-                "https://blackint-frontend.vercel.app",
-                "https://blackint-frontend-git-develop-blackints-projects.vercel.app"
+        configuration.setAllowedOriginPatterns(List.of(
+        "http://localhost:*",
+        "https://blackint-frontend.vercel.app",
+        "https://blackint-frontend-git-develop-blackints-projects.vercel.app"
         ));
 
         configuration.setAllowedMethods(List.of(
