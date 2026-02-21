@@ -39,12 +39,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // Disable CSRF for REST APIs
-                .csrf(csrf -> csrf.disable())
-
-                // Enable CORS (for frontend apps)
-                .cors(Customizer.withDefaults())
-
                 // Stateless session (JWT)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -52,6 +46,7 @@ public class SecurityConfig {
 
                  .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                  .csrf(csrf -> csrf.disable())
+                 
                 // Authorization Rules
                 .authorizeHttpRequests(auth -> auth
 
@@ -67,20 +62,16 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // ================= PUBLIC CONTACT =================
-                        .requestMatchers("/api/contacts").permitAll()
-                        .requestMatchers("/api/contacts/*").permitAll()
+                        .requestMatchers("/api/contacts/**").permitAll()
 
                         // ================= PUBLIC BLOG =================
-                        .requestMatchers("/api/blogs/published").permitAll()
-                        .requestMatchers("/api/blogs/*").permitAll()
-                        
+                        .requestMatchers("/api/blogs/**").permitAll()
+
                         // ================= PUBLIC PROJECTS =================
-                        .requestMatchers("/api/projects/published").permitAll()
-                        .requestMatchers("/api/projects/*").permitAll()
+                        .requestMatchers("/api/projects/**").permitAll()
 
                         // ================= PUBLIC SERVICES =================
-                        .requestMatchers("/api/offerings/published").permitAll()
-                        .requestMatchers( "/api/offerings/*").permitAll()
+                        .requestMatchers( "/api/offerings/**").permitAll()
 
                         // ================= ANY OTHER =================
                         .anyRequest().authenticated()
