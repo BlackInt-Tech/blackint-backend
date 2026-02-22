@@ -32,11 +32,15 @@ public class BlogService {
 
     public BlogResponse create(CreateBlogRequest request) {
 
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+                throw new IllegalArgumentException("Title cannot be empty");
+        }
+
         String slug = generateUniqueSlug(request.getTitle());
 
         Blog blog = buildEntity(new Blog(), request, slug);
 
-        blog.setPublicId(UUID.randomUUID().toString());
+        blog.setPublicId(UUID.randomUUID().toString().replace("-", "").substring(0, 18));
         blog.setStatus(BlogStatus.DRAFT);
         blog.setCreatedAt(LocalDateTime.now());
         blog.setUpdatedAt(LocalDateTime.now());
@@ -46,15 +50,15 @@ public class BlogService {
         blogRepository.save(blog);
 
         return BlogMapper.toResponse(blog);
-    }
+        }
 
     // =================================================
     // UPDATE
     // =================================================
 
-    public BlogResponse update(UUID id, CreateBlogRequest request) {
+    public BlogResponse update(String publicId, CreateBlogRequest request) {
 
-        Blog blog = blogRepository.findById(id)
+        Blog blog = blogRepository.findByPublicIdAndIsDeletedFalse(publicId)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
         if (!blog.getTitle().equals(request.getTitle())) {
@@ -73,11 +77,12 @@ public class BlogService {
     // PUBLISH / SCHEDULE
     // =================================================
 
-    public BlogResponse changeStatus(UUID id,
+    @Transactional
+    public BlogResponse changeStatus(String publicId,
                                      BlogStatus status,
                                      LocalDateTime scheduledAt) {
 
-        Blog blog = blogRepository.findById(id)
+        Blog blog = blogRepository.findByPublicIdAndIsDeletedFalse(publicId)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
         if (status == BlogStatus.PUBLISHED) {
@@ -101,9 +106,9 @@ public class BlogService {
     // SOFT DELETE
     // =================================================
 
-    public void softDelete(UUID id) {
+    public void softDelete(String publicId) {
 
-        Blog blog = blogRepository.findById(id)
+        Blog blog = blogRepository.findByPublicIdAndIsDeletedFalse(publicId)
                 .orElseThrow(() -> new RuntimeException("Blog not found"));
 
         blog.setIsDeleted(true);
@@ -116,6 +121,7 @@ public class BlogService {
     // PUBLIC READ APIs (DB Optimized)
     // =================================================
 
+    @Transactional
     public Page<BlogResponse> getPublished(int page, int size) {
 
         return blogRepository

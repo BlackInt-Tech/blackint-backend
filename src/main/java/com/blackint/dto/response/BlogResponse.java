@@ -1,14 +1,16 @@
 package com.blackint.dto.response;
 
 import com.blackint.entity.BlogStatus;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BlogResponse {
 
     private String publicId;
@@ -19,9 +21,10 @@ public class BlogResponse {
     private String featuredImage;
 
     private String authorName;
-    private BlogStatus status;
 
+    private BlogStatus status;
     private Boolean isFeatured;
+
     private Integer readTime;
     private Long viewCount;
 

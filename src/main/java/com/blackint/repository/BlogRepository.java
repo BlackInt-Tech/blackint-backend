@@ -10,31 +10,23 @@ import java.util.UUID;
 
 public interface BlogRepository extends JpaRepository<Blog, UUID> {
 
+    Optional<Blog> findByPublicIdAndIsDeletedFalse(String publicId);
+
     Optional<Blog> findBySlugAndIsDeletedFalse(String slug);
 
     boolean existsBySlug(String slug);
 
-    // ============================================
-    // PUBLISHED
-    // ============================================
+    boolean existsBySlugAndPublicIdNot(String slug, String publicId);
 
     Page<Blog> findByStatusAndIsDeletedFalse(
             BlogStatus status,
             Pageable pageable
     );
 
-    // ============================================
-    // FEATURED
-    // ============================================
-
     Page<Blog> findByStatusAndIsFeaturedTrueAndIsDeletedFalse(
             BlogStatus status,
             Pageable pageable
     );
-
-    // ============================================
-    // CATEGORY
-    // ============================================
 
     @Query("""
         SELECT b FROM Blog b
@@ -42,14 +34,7 @@ public interface BlogRepository extends JpaRepository<Blog, UUID> {
         AND b.status = 'PUBLISHED'
         AND b.isDeleted = false
     """)
-    Page<Blog> findByCategorySlug(
-            String slug,
-            Pageable pageable
-    );
-
-    // ============================================
-    // TAG
-    // ============================================
+    Page<Blog> findByCategorySlug(String slug, Pageable pageable);
 
     @Query("""
         SELECT b FROM Blog b
@@ -58,8 +43,5 @@ public interface BlogRepository extends JpaRepository<Blog, UUID> {
         AND b.status = 'PUBLISHED'
         AND b.isDeleted = false
     """)
-    Page<Blog> findByTagSlug(
-            String slug,
-            Pageable pageable
-    );
+    Page<Blog> findByTagSlug(String slug, Pageable pageable);
 }

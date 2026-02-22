@@ -21,7 +21,7 @@ public class OfferingController {
 
     // ================= ADMIN CREATE =================
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
+    @PostMapping("/create")
     public ApiResponse<OfferingResponse> create(
             @RequestBody OfferingRequest request
     ) {
@@ -30,7 +30,7 @@ public class OfferingController {
 
     // ================= ADMIN UPDATE =================
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{publicId}")
+    @PutMapping("/update/{publicId}")
     public ApiResponse<OfferingResponse> update(
             @PathVariable String publicId,
             @RequestBody OfferingRequest request
@@ -40,7 +40,7 @@ public class OfferingController {
 
     // ================= ADMIN DELETE =================
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{publicId}")
+    @DeleteMapping("/delete/{publicId}")
     public ApiResponse<Void> delete(@PathVariable String publicId) {
         service.softDelete(publicId);
         return ApiResponse.success(null);
@@ -48,7 +48,7 @@ public class OfferingController {
 
     // ================= ADMIN RESTORE =================
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{publicId}/restore")
+    @PutMapping("/restore/{publicId}")
     public ApiResponse<Void> restore(@PathVariable String publicId) {
         service.restore(publicId);
         return ApiResponse.success(null);
@@ -56,7 +56,7 @@ public class OfferingController {
 
     // ================= ADMIN PUBLISH =================
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{publicId}/publish")
+    @PutMapping("/publish/{publicId}")
     public ApiResponse<OfferingResponse> publish(
             @PathVariable String publicId
     ) {
@@ -69,7 +69,7 @@ public class OfferingController {
         return ApiResponse.success(service.getPublished());
     }
 
-    @GetMapping("/{slug}")
+    @GetMapping("/slug/{slug}")
     public ApiResponse<OfferingResponse> getBySlug(
             @PathVariable String slug
     ) {
@@ -78,7 +78,7 @@ public class OfferingController {
 
     // ================= ADMIN VIEW ALL =================
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/all")
+    @GetMapping("/all")
     public ApiResponse<List<OfferingResponse>> getAllForAdmin() {
         return ApiResponse.success(service.getAllForAdmin());
     }

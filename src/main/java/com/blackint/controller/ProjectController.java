@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/projects")
 @RequiredArgsConstructor
 public class ProjectController {
 
@@ -23,7 +24,7 @@ public class ProjectController {
     // ================= ADMIN ROUTES =======================
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/api/admin/projects")
+    @PostMapping("/create")
     public ApiResponse<ProjectResponse> create(
             @RequestBody ProjectRequest request) {
 
@@ -31,7 +32,7 @@ public class ProjectController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/api/admin/projects/{publicId}")
+    @PutMapping("/update/{publicId}")
     public ApiResponse<ProjectResponse> update(
             @PathVariable String publicId,
             @RequestBody ProjectRequest request) {
@@ -40,7 +41,7 @@ public class ProjectController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/api/admin/projects/{publicId}")
+    @DeleteMapping("/delete/{publicId}")
     public ApiResponse<Void> delete(@PathVariable String publicId) {
 
         projectService.softDelete(publicId);
@@ -48,7 +49,7 @@ public class ProjectController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/api/admin/projects/{publicId}/restore")
+    @PutMapping("/restore/{publicId}")
     public ApiResponse<Void> restore(@PathVariable String publicId) {
 
         projectService.restore(publicId);
@@ -56,35 +57,35 @@ public class ProjectController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/api/admin/projects/{publicId}/publish")
+    @PutMapping("/publish/{publicId}")
     public ApiResponse<ProjectResponse> publish(@PathVariable String publicId) {
 
         return ApiResponse.success(projectService.publish(publicId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/api/admin/projects")
+    @GetMapping("/getAll")
     public ApiResponse<List<ProjectResponse>> getAllForAdmin() {
 
         return ApiResponse.success(projectService.getAllForAdmin());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/api/admin/projects/analytics")
+    @GetMapping("/analytics")
     public ApiResponse<LeadAnalyticsResponse> analytics() {
 
-        return contactService.getAnalytics();
+        return ApiResponse.success(contactService.getAnalytics());
     }
 
     // ================= PUBLIC ROUTES ======================
 
-    @GetMapping("/api/projects")
+    @GetMapping("/published")
     public ApiResponse<List<ProjectResponse>> getPublished() {
 
         return ApiResponse.success(projectService.getPublished());
     }
 
-    @GetMapping("/api/projects/{slug}")
+    @GetMapping("/slug/{slug}")
     public ApiResponse<ProjectResponse> getBySlug(
             @PathVariable String slug) {
 

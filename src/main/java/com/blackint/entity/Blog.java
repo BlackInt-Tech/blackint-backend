@@ -33,6 +33,7 @@ public class Blog {
     private String excerpt;
 
     @Lob
+    @Basic(fetch = FetchType.EAGER)
     @Column(nullable = false)
     private String content;
 
@@ -45,11 +46,14 @@ public class Blog {
 
     private Integer readTime;
 
+    @Column(nullable = false)
     private Long viewCount = 0L;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private BlogStatus status;
 
+    @Column(nullable = false)
     private Boolean isFeatured = false;
 
     private LocalDateTime scheduledAt;
@@ -57,9 +61,11 @@ public class Blog {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
     private Boolean isDeleted = false;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
     private BlogCategory category;
 
     @ManyToMany
@@ -70,4 +76,3 @@ public class Blog {
     )
     private Set<BlogTag> tags;
 }
-

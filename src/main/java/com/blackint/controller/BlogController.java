@@ -1,5 +1,6 @@
 package com.blackint.controller;
 
+import com.blackint.common.ApiResponse;
 import com.blackint.dto.request.CreateBlogRequest;
 import com.blackint.dto.response.BlogResponse;
 import com.blackint.entity.BlogStatus;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,96 +24,96 @@ public class BlogController {
 
     private final BlogService blogService;
 
-    // ==============================
-    // PUBLIC APIs
-    // ==============================
+    // ================= PUBLIC =================
 
-    // GET /api/blogs
-    @GetMapping
-    public Page<BlogResponse> getPublished(
+    @GetMapping("/published")
+    public ApiResponse<List<BlogResponse>> getPublished(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return blogService.getPublished(page, size);
+        return ApiResponse.success(
+                blogService.getPublished(page, size).getContent()
+        );
     }
 
-    // GET /api/blogs/{slug}
     @GetMapping("/{slug}")
-    public BlogResponse getBySlug(@PathVariable String slug) {
-        return blogService.getBySlug(slug);
+    public ApiResponse<BlogResponse> getBySlug(@PathVariable String slug) {
+        return ApiResponse.success(blogService.getBySlug(slug));
     }
 
-    // GET /api/blogs/featured
     @GetMapping("/featured")
-    public Page<BlogResponse> getFeatured(
+    public ApiResponse<List<BlogResponse>> getFeatured(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
-        return blogService.getFeatured(page, size);
+        return ApiResponse.success(
+            blogService.getFeatured(page, size).getContent());    
     }
 
-    // GET /api/blogs/category/{slug}
     @GetMapping("/category/{slug}")
-    public Page<BlogResponse> getByCategory(
+    public ApiResponse<List<BlogResponse>> getByCategory(
             @PathVariable String slug,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return blogService.getByCategory(slug, page, size);
-    }
+        return ApiResponse.success(
+            blogService.getFeatured(page, size).getContent());    
+        }
 
-    // GET /api/blogs/tag/{slug}
     @GetMapping("/tag/{slug}")
-    public Page<BlogResponse> getByTag(
+    public ApiResponse<List<BlogResponse>> getByTag(
             @PathVariable String slug,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return blogService.getByTag(slug, page, size);
+        return ApiResponse.success(
+            blogService.getFeatured(page, size).getContent());    
+        }
+
+    // ================= ADMIN =================
+
+    @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<BlogResponse> create(
+            @Valid @RequestBody CreateBlogRequest request) {
+
+        return ApiResponse.success(blogService.create(request));
     }
 
-    // ==============================
-    // ADMIN APIs
-    // ==============================
-
-    // POST /api/admin/blogs
-    @PostMapping("/admin")
+    @PutMapping("/update/{publicId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public BlogResponse create(@Valid @RequestBody CreateBlogRequest request) {
-        return blogService.create(request);
+    public ApiResponse<BlogResponse> update(
+            @PathVariable String publicId,
+            @Valid @RequestBody CreateBlogRequest request) {
+
+        return ApiResponse.success(blogService.update(publicId, request));
     }
 
-    // PUT /api/admin/blogs/{id}
-    @PutMapping("/admin/{id}")
+    @PutMapping("/publish/{publicId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public BlogResponse update(
-            @PathVariable UUID id,
-            @Valid @RequestBody CreateBlogRequest request
-    ) {
-        return blogService.update(id, request);
+    public ApiResponse<BlogResponse> publish(@PathVariable String publicId) {
+
+        return ApiResponse.success(
+                blogService.changeStatus(publicId, BlogStatus.PUBLISHED, null)
+        );
     }
 
-    // PUT /api/admin/blogs/{id}/publish
-    @PutMapping("/admin/{id}/publish")
+    @PutMapping("/schedule/{publicId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public BlogResponse publish(@PathVariable UUID id) {
-        return blogService.changeStatus(id, BlogStatus.PUBLISHED, null);
+    public ApiResponse<BlogResponse> schedule(
+            @PathVariable String publicId,
+            @RequestParam LocalDateTime scheduledAt) {
+
+        return ApiResponse.success(
+                blogService.changeStatus(publicId, BlogStatus.SCHEDULED, scheduledAt)
+        );
     }
 
-    // PUT /api/admin/blogs/{id}/schedule
-    @PutMapping("/admin/{id}/schedule")
+    @DeleteMapping("/delete/{publicId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public BlogResponse schedule(
-            @PathVariable UUID id,
-            @RequestParam LocalDateTime scheduledAt
-    ) {
-        return blogService.changeStatus(id, BlogStatus.SCHEDULED, scheduledAt);
-    }
+    public ApiResponse<Void> delete(@PathVariable String publicId) {
 
-    // DELETE /api/admin/blogs/{id}
-    @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void delete(@PathVariable UUID id) {
-        blogService.softDelete(id);
+        blogService.softDelete(publicId);
+        return ApiResponse.successMessage("Blog deleted successfully");
     }
 }

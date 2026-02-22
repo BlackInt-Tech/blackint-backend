@@ -1,6 +1,5 @@
 package com.blackint.service;
 
-import com.blackint.common.ApiResponse;
 import com.blackint.dto.request.AuthRequest;
 import com.blackint.dto.request.RegisterRequest;
 import com.blackint.dto.response.AuthResponse;
@@ -15,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -26,8 +23,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-    // LOGIN
-    public ApiResponse<AuthResponse> login(AuthRequest request) {
+    public AuthResponse login(AuthRequest request) {
 
         AdminUser user = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
@@ -41,19 +37,13 @@ public class AuthService {
 
         refreshTokenService.createRefreshToken(user, refreshToken);
 
-        return ApiResponse.<AuthResponse>builder()
-                .success(true)
-                .message("Login successful")
-                .data(AuthResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build())
-                .timestamp(LocalDateTime.now())
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
-    // REGISTER
-    public ApiResponse<RegisterResponse> register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
 
         if (repository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Admin already exists");
@@ -69,23 +59,15 @@ public class AuthService {
 
         repository.save(admin);
 
-        RegisterResponse response = RegisterResponse.builder()
+        return RegisterResponse.builder()
                 .id(admin.getId().toString())
                 .fullName(admin.getFullName())
                 .email(admin.getEmail())
                 .role(admin.getRole())
                 .build();
-
-        return ApiResponse.<RegisterResponse>builder()
-                .success(true)
-                .message("Admin registered successfully")
-                .data(response)
-                .timestamp(LocalDateTime.now())
-                .build();
     }
 
-    // REFRESH TOKEN
-    public ApiResponse<AuthResponse> refresh(String refreshToken) {
+    public AuthResponse refresh(String refreshToken) {
 
         RefreshToken storedToken = refreshTokenService.validateToken(refreshToken);
 
@@ -93,26 +75,18 @@ public class AuthService {
                 storedToken.getAdminUser().getEmail()
         );
 
-        return ApiResponse.<AuthResponse>builder()
-                .success(true)
-                .message("Access token refreshed")
-                .data(AuthResponse.builder()
-                        .accessToken(newAccessToken)
-                        .refreshToken(refreshToken)
-                        .build())
-                .timestamp(LocalDateTime.now())
+        return AuthResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
-    // LOGOUT
-    public ApiResponse<Void> logout(String refreshToken) {
-
+    public void logout(String refreshToken) {
         refreshTokenService.revoke(refreshToken);
+    }
 
-        return ApiResponse.<Void>builder()
-                .success(true)
-                .message("Logged out successfully")
-                .timestamp(LocalDateTime.now())
-                .build();
+    public void delete(String refreshToken) {
+        
+        
     }
 }

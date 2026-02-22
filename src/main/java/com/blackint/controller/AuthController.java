@@ -2,7 +2,6 @@ package com.blackint.controller;
 
 import com.blackint.common.ApiResponse;
 import com.blackint.dto.request.AuthRequest;
-import com.blackint.dto.request.RefreshTokenRequest;
 import com.blackint.dto.request.RegisterRequest;
 import com.blackint.dto.response.AuthResponse;
 import com.blackint.dto.response.RegisterResponse;
@@ -20,35 +19,41 @@ public class AuthController {
 
     private final AuthService service;
 
-    // REGISTER
     @PostMapping("/register")
     public ApiResponse<RegisterResponse> register(
             @Valid @RequestBody RegisterRequest request) {
 
-        return service.register(request);
+        return ApiResponse.success(service.register(request));
     }
 
-    // LOGIN
     @PostMapping("/login")
     public ApiResponse<AuthResponse> login(
             @Valid @RequestBody AuthRequest request) {
 
-        return service.login(request);
+        return ApiResponse.success(service.login(request));
     }
 
-    // REFRESH ACCESS TOKEN
     @PostMapping("/refresh")
     public ApiResponse<AuthResponse> refresh(
-            @RequestParam RefreshTokenRequest request) {
+            @RequestParam String refreshToken) {
 
-        return service.refresh(request.getRefreshToken());
+        return ApiResponse.success(service.refresh(refreshToken));
     }
 
-    // LOGOUT
     @PostMapping("/logout")
     public ApiResponse<Void> logout(
-            @RequestParam RefreshTokenRequest request) {
+            @RequestParam String refreshToken) {
 
-        return service.logout(request.getRefreshToken());
+        service.logout(refreshToken);
+        return ApiResponse.successMessage("Logged out successfully");
     }
+
+    @DeleteMapping("/delete")
+    public ApiResponse<Void> delete(
+            @RequestParam String refreshToken){
+
+        service.delete(refreshToken);
+        return ApiResponse.successMessage("Deleted successfully");
+    }
+
 }
