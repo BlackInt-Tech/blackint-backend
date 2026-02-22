@@ -2,7 +2,9 @@ package com.blackint.mapper;
 
 import com.blackint.dto.response.BlogResponse;
 import com.blackint.entity.Blog;
+import com.blackint.entity.BlogTag;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BlogMapper {
@@ -26,9 +28,10 @@ public class BlogMapper {
                 .tags(blog.getTags() != null ?
                         blog.getTags()
                                 .stream()
-                                .map(t -> t.getName())
+                                .filter(t -> t != null)
+                                .map(BlogTag::getName)
                                 .collect(Collectors.toSet())
-                        : null)
+                        : Set.of())
                 .publishedAt(blog.getPublishedAt())
                 .createdAt(blog.getCreatedAt())
                 .build();

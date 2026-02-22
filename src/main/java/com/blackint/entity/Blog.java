@@ -33,6 +33,7 @@ public class Blog {
     private String excerpt;
 
     @Lob
+    @Basic(fetch = FetchType.EAGER)
     @Column(nullable = false)
     private String content;
 

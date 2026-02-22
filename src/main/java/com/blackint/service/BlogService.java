@@ -32,11 +32,15 @@ public class BlogService {
 
     public BlogResponse create(CreateBlogRequest request) {
 
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+                throw new IllegalArgumentException("Title cannot be empty");
+        }
+
         String slug = generateUniqueSlug(request.getTitle());
 
         Blog blog = buildEntity(new Blog(), request, slug);
 
-        blog.setPublicId(UUID.randomUUID().toString());
+        blog.setPublicId(UUID.randomUUID().toString().replace("-", "").substring(0, 18));
         blog.setStatus(BlogStatus.DRAFT);
         blog.setCreatedAt(LocalDateTime.now());
         blog.setUpdatedAt(LocalDateTime.now());
@@ -46,7 +50,7 @@ public class BlogService {
         blogRepository.save(blog);
 
         return BlogMapper.toResponse(blog);
-    }
+        }
 
     // =================================================
     // UPDATE
@@ -73,6 +77,7 @@ public class BlogService {
     // PUBLISH / SCHEDULE
     // =================================================
 
+    @Transactional
     public BlogResponse changeStatus(String publicId,
                                      BlogStatus status,
                                      LocalDateTime scheduledAt) {
@@ -116,6 +121,7 @@ public class BlogService {
     // PUBLIC READ APIs (DB Optimized)
     // =================================================
 
+    @Transactional
     public Page<BlogResponse> getPublished(int page, int size) {
 
         return blogRepository
