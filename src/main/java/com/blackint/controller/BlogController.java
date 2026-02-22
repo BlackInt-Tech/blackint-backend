@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,11 +27,13 @@ public class BlogController {
     // ================= PUBLIC =================
 
     @GetMapping("/published")
-    public ApiResponse<Page<BlogResponse>> getPublished(
+    public ApiResponse<List<BlogResponse>> getPublished(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ApiResponse.success(blogService.getPublished(page, size));
+        return ApiResponse.success(
+                blogService.getPublished(page, size).getContent()
+        );
     }
 
     @GetMapping("/{slug}")
@@ -39,30 +42,33 @@ public class BlogController {
     }
 
     @GetMapping("/featured")
-    public ApiResponse<Page<BlogResponse>> getFeatured(
+    public ApiResponse<List<BlogResponse>> getFeatured(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
-        return ApiResponse.success(blogService.getFeatured(page, size));
+        return ApiResponse.success(
+            blogService.getFeatured(page, size).getContent());    
     }
 
     @GetMapping("/category/{slug}")
-    public ApiResponse<Page<BlogResponse>> getByCategory(
+    public ApiResponse<List<BlogResponse>> getByCategory(
             @PathVariable String slug,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ApiResponse.success(blogService.getByCategory(slug, page, size));
-    }
+        return ApiResponse.success(
+            blogService.getFeatured(page, size).getContent());    
+        }
 
     @GetMapping("/tag/{slug}")
-    public ApiResponse<Page<BlogResponse>> getByTag(
+    public ApiResponse<List<BlogResponse>> getByTag(
             @PathVariable String slug,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ApiResponse.success(blogService.getByTag(slug, page, size));
-    }
+        return ApiResponse.success(
+            blogService.getFeatured(page, size).getContent());    
+        }
 
     // ================= ADMIN =================
 
