@@ -74,7 +74,7 @@ public class ProjectController {
     @GetMapping("/analytics")
     public ApiResponse<LeadAnalyticsResponse> analytics() {
 
-        return contactService.getAnalytics();
+        return ApiResponse.success(contactService.getAnalytics());
     }
 
     // ================= PUBLIC ROUTES ======================

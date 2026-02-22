@@ -23,50 +23,48 @@ public class ContactController {
 
     private final ContactService service;
 
-    // ================= PUBLIC =================
-
     @PostMapping("/submit")
     public ApiResponse<Void> submit(
             @Valid @RequestBody ContactRequest request,
             HttpServletRequest httpRequest
     ) {
-        String ip = httpRequest.getRemoteAddr();
-        return service.submit(request, ip);
+        service.submit(request, httpRequest.getRemoteAddr());
+        return ApiResponse.successMessage(
+                "Thank you! Our team will contact you shortly."
+        );
     }
 
-    // ================= ADMIN =================
-
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/getAll")
+    @GetMapping
     public ApiResponse<Page<ContactResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) LeadStatus status,
             @RequestParam(required = false) String search
     ) {
-        return service.getAll(page, size, status, search);
+        return ApiResponse.success(service.getAll(page, size, status, search));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/updateStatus/{publicId}")
+    @PutMapping("/{publicId}")
     public ApiResponse<Void> updateStatus(
             @PathVariable String publicId,
             @RequestParam LeadStatus status
     ) {
-        return service.updateStatus(publicId, status);
+        service.updateStatus(publicId, status);
+        return ApiResponse.successMessage("Lead status updated successfully");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/delete/{publicId}")
-    public ApiResponse<Void> delete(
-            @PathVariable String publicId
-    ) {
-        return service.delete(publicId);
+    @DeleteMapping("/{publicId}")
+    public ApiResponse<Void> delete(@PathVariable String publicId) {
+        service.delete(publicId);
+        return ApiResponse.successMessage("Lead deleted successfully");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/analytics")
     public ApiResponse<LeadAnalyticsResponse> analytics() {
-        return service.getAnalytics();
+        return ApiResponse.success(service.getAnalytics());
     }
 }

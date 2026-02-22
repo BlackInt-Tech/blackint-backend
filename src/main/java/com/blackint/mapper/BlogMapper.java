@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 public class BlogMapper {
 
     public static BlogResponse toResponse(Blog blog) {
+
         return BlogResponse.builder()
                 .publicId(blog.getPublicId())
                 .title(blog.getTitle())
@@ -20,9 +21,13 @@ public class BlogMapper {
                 .isFeatured(blog.getIsFeatured())
                 .readTime(blog.getReadTime())
                 .viewCount(blog.getViewCount())
-                .category(blog.getCategory() != null ? blog.getCategory().getName() : null)
+                .category(blog.getCategory() != null ?
+                        blog.getCategory().getName() : null)
                 .tags(blog.getTags() != null ?
-                        blog.getTags().stream().map(t -> t.getName()).collect(Collectors.toSet())
+                        blog.getTags()
+                                .stream()
+                                .map(t -> t.getName())
+                                .collect(Collectors.toSet())
                         : null)
                 .publishedAt(blog.getPublishedAt())
                 .createdAt(blog.getCreatedAt())
