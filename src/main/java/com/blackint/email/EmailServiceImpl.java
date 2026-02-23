@@ -2,18 +2,21 @@ package com.blackint.email;
 
 import com.blackint.entity.Contact;
 import com.blackint.entity.LeadStatus;
-import jakarta.mail.internet.MimeMessage;
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.mail.javamail.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Service
 @Profile("!test")
@@ -21,14 +24,16 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class EmailServiceImpl implements EmailService {
 
-    private final JavaMailSender mailSender;
+    private final SendGrid sendGrid;
     private final EmailLogRepository emailLogRepository;
 
-    @Value("${spring.mail.username}")
+    @Value("${blackint.from.email}")
     private String fromEmail;
 
     @Value("${blackint.admin.email}")
     private String adminEmail;
+
+    private static final int MAX_RETRY = 3;
 
     // ================= USER CONFIRMATION =================
 
@@ -37,50 +42,9 @@ public class EmailServiceImpl implements EmailService {
     public void sendLeadSubmissionEmail(Contact contact) {
 
         String subject = "We've received your message – BlackInt";
+        String htmlContent = EmailTemplateBuilder.buildUserConfirmationTemplate(contact);
 
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-            helper.setFrom(fromEmail);
-            helper.setTo(contact.getEmail());
-            helper.setSubject(subject);
-            helper.setText(
-                    EmailTemplateBuilder.buildUserConfirmationTemplate(contact),
-                    true
-            );
-
-            mailSender.send(message);
-
-            emailLogRepository.save(
-                    EmailLog.builder()
-                            .publicId(contact.getPublicId())
-                            .recipient(contact.getEmail())
-                            .subject(subject)
-                            .status(EmailStatus.SUCCESS)
-                            .createdAt(LocalDateTime.now())
-                            .build()
-            );
-
-            log.info("User email sent | publicId={}", contact.getPublicId());
-
-        } catch (Exception e) {
-
-            emailLogRepository.save(
-                    EmailLog.builder()
-                            .publicId(contact.getPublicId())
-                            .recipient(contact.getEmail())
-                            .subject(subject)
-                            .status(EmailStatus.FAILED)
-                            .errorMessage(e.getMessage())
-                            .retryCount(0)
-                            .nextRetryAt(LocalDateTime.now().plusMinutes(5))
-                            .createdAt(LocalDateTime.now())
-                            .build()
-            );
-
-            log.error("User email failed | publicId={}", contact.getPublicId(), e);
-        }
+        sendEmail(contact.getPublicId(), contact.getEmail(), subject, htmlContent);
     }
 
     // ================= ADMIN NOTIFICATION =================
@@ -90,106 +54,108 @@ public class EmailServiceImpl implements EmailService {
     public void sendAdminNotification(Contact contact) {
 
         String subject = "New Lead Received – " + contact.getSubject();
+        String htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplate(contact);
 
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-            helper.setFrom(fromEmail);
-            helper.setTo(adminEmail);
-            helper.setSubject(subject);
-            helper.setText(
-                    EmailTemplateBuilder.buildAdminNotificationTemplate(contact),
-                    true
-            );
-
-            mailSender.send(message);
-
-            emailLogRepository.save(
-                    EmailLog.builder()
-                            .publicId(contact.getPublicId())
-                            .recipient(adminEmail)
-                            .subject(subject)
-                            .status(EmailStatus.SUCCESS)
-                            .createdAt(LocalDateTime.now())
-                            .build()
-            );
-
-            log.info("Admin notification sent | publicId={}", contact.getPublicId());
-
-        } catch (Exception e) {
-
-            emailLogRepository.save(
-                    EmailLog.builder()
-                            .publicId(contact.getPublicId())
-                            .recipient(adminEmail)
-                            .subject(subject)
-                            .status(EmailStatus.FAILED)
-                            .errorMessage(e.getMessage())
-                            .retryCount(0)
-                            .nextRetryAt(LocalDateTime.now().plusMinutes(5))
-                            .createdAt(LocalDateTime.now())
-                            .build()
-            );
-
-            log.error("Admin email failed | publicId={}", contact.getPublicId(), e);
-        }
+        sendEmail(contact.getPublicId(), adminEmail, subject, htmlContent);
     }
 
-    // ================= STATUS UPDATE EMAIL =================
+    // ================= STATUS UPDATE =================
 
     @Async
     @Override
     public void sendLeadStatusUpdateEmail(Contact contact) {
 
-        if (contact.getStatus() != LeadStatus.CONVERTED) {
+        if (contact.getStatus() != LeadStatus.CONVERTED) return;
+
+        String subject = "Welcome Aboard – BlackInt 🚀";
+        String htmlContent = EmailTemplateBuilder.buildConvertedTemplate(contact);
+
+        sendEmail(contact.getPublicId(), contact.getEmail(), subject, htmlContent);
+    }
+
+    // ================= CORE SEND METHOD =================
+
+    private void sendEmail(String publicId,
+                           String recipient,
+                           String subject,
+                           String htmlContent) {
+
+        if (recipient == null || recipient.isBlank()) {
+            log.error("Recipient email is null or empty | publicId={}", publicId);
             return;
         }
 
-        String subject = "Welcome Aboard – BlackInt 🚀";
+        Email from = new Email(fromEmail);
+        Email to = new Email(recipient);
+        Content content = new Content("text/html", htmlContent);
+
+        Mail mail = new Mail(from, subject, to, content);
+
+        Request request = new Request();
 
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
 
-            helper.setFrom(fromEmail);
-            helper.setTo(contact.getEmail());
-            helper.setSubject(subject);
-            helper.setText(
-                    EmailTemplateBuilder.buildConvertedTemplate(contact),
-                    true
-            );
+            Response response = sendGrid.api(request);
 
-            mailSender.send(message);
+            int statusCode = response.getStatusCode();
+            String responseBody = response.getBody();
 
-            emailLogRepository.save(
-                    EmailLog.builder()
-                            .publicId(contact.getPublicId())
-                            .recipient(contact.getEmail())
-                            .subject(subject)
-                            .status(EmailStatus.SUCCESS)
-                            .createdAt(LocalDateTime.now())
-                            .build()
-            );
+            // SendGrid returns 202 for success
+            if (statusCode == 202) {
 
-            log.info("Converted email sent | publicId={}", contact.getPublicId());
+                emailLogRepository.save(
+                        EmailLog.builder()
+                                .publicId(publicId)
+                                .recipient(recipient)
+                                .subject(subject)
+                                .status(EmailStatus.SUCCESS)
+                                .createdAt(LocalDateTime.now())
+                                .retryCount(0)
+                                .build()
+                );
 
-        } catch (Exception e) {
+                log.info("Email sent successfully | publicId={} | recipient={}", publicId, recipient);
 
-            emailLogRepository.save(
-                    EmailLog.builder()
-                            .publicId(contact.getPublicId())
-                            .recipient(contact.getEmail())
-                            .subject(subject)
-                            .status(EmailStatus.FAILED)
-                            .errorMessage(e.getMessage())
-                            .retryCount(0)
-                            .nextRetryAt(LocalDateTime.now().plusMinutes(5))
-                            .createdAt(LocalDateTime.now())
-                            .build()
-            );
+            } else {
 
-            log.error("Converted email failed | publicId={}", contact.getPublicId(), e);
+                saveFailure(publicId, recipient, subject,
+                        "SendGrid status: " + statusCode + " | body: " + responseBody);
+            }
+
+        } catch (IOException ex) {
+
+            saveFailure(publicId, recipient, subject, ex.getMessage());
+
+        } catch (Exception ex) {
+
+            saveFailure(publicId, recipient, subject, ex.getMessage());
         }
+    }
+
+    // ================= FAILURE HANDLER =================
+
+    private void saveFailure(String publicId,
+                             String recipient,
+                             String subject,
+                             String errorMessage) {
+
+        emailLogRepository.save(
+                EmailLog.builder()
+                        .publicId(publicId)
+                        .recipient(recipient)
+                        .subject(subject)
+                        .status(EmailStatus.FAILED)
+                        .errorMessage(errorMessage)
+                        .retryCount(0)
+                        .nextRetryAt(LocalDateTime.now().plusMinutes(5))
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
+
+        log.error("Email failed | publicId={} | recipient={} | error={}",
+                publicId, recipient, errorMessage);
     }
 }

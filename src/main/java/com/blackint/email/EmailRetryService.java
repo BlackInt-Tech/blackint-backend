@@ -1,13 +1,16 @@
 package com.blackint.email;
 
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.mail.javamail.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.internet.MimeMessage;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,11 +20,11 @@ import java.util.List;
 public class EmailRetryService {
 
     private final EmailLogRepository emailLogRepository;
-    private final JavaMailSender mailSender;
+    private final SendGrid sendGrid;
 
     private static final int MAX_RETRY = 3;
 
-    @Scheduled(fixedRate = 300000) // every 5 minutes
+    @Scheduled(fixedRate = 300000)
     public void retryFailedEmails() {
 
         List<EmailLog> failedEmails =
@@ -38,33 +41,44 @@ public class EmailRetryService {
             }
 
             try {
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-                helper.setTo(logEntry.getRecipient());
-                helper.setSubject(logEntry.getSubject());
-                helper.setText("Retrying previously failed email.", true);
+                Email from = new Email("no-reply@yourdomain.com");
+                Email to = new Email(logEntry.getRecipient());
+                Content content = new Content("text/html",
+                        "Retrying previously failed email.");
 
-                mailSender.send(message);
+                Mail mail = new Mail(from, logEntry.getSubject(), to, content);
 
-                logEntry.setStatus(EmailStatus.SUCCESS);
-                logEntry.setErrorMessage(null);
-                logEntry.setNextRetryAt(null);
+                Request request = new Request();
+                request.setMethod(Method.POST);
+                request.setEndpoint("mail/send");
+                request.setBody(mail.build());
 
-                emailLogRepository.save(logEntry);
+                Response response = sendGrid.api(request);
 
-                log.info("Email retry successful | id={}", logEntry.getId());
+                if (response.getStatusCode() >= 200 &&
+                        response.getStatusCode() < 300) {
 
-            } catch (Exception e) {
+                    logEntry.setStatus(EmailStatus.SUCCESS);
+                    logEntry.setErrorMessage(null);
+                    logEntry.setNextRetryAt(null);
+
+                } else {
+
+                    throw new RuntimeException(response.getBody());
+                }
+
+            } catch (IOException e) {
 
                 logEntry.setRetryCount(logEntry.getRetryCount() + 1);
                 logEntry.setNextRetryAt(LocalDateTime.now().plusMinutes(5));
                 logEntry.setErrorMessage(e.getMessage());
 
-                emailLogRepository.save(logEntry);
-
-                log.error("Email retry failed | id={}", logEntry.getId(), e);
+                log.error("Email retry failed | id={}",
+                        logEntry.getId(), e);
             }
+
+            emailLogRepository.save(logEntry);
         }
     }
 }
