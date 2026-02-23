@@ -9,6 +9,7 @@ import com.sendgrid.helpers.mail.objects.Email;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
@@ -31,6 +32,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Value("${blackint.admin.email}")
     private String adminEmail;
+
+    private static final int MAX_RETRY = 3;
 
     // ================= USER CONFIRMATION =================
 
@@ -77,6 +80,11 @@ public class EmailServiceImpl implements EmailService {
                            String subject,
                            String htmlContent) {
 
+        if (recipient == null || recipient.isBlank()) {
+            log.error("Recipient email is null or empty | publicId={}", publicId);
+            return;
+        }
+
         Email from = new Email(fromEmail);
         Email to = new Email(recipient);
         Content content = new Content("text/html", htmlContent);
@@ -92,7 +100,11 @@ public class EmailServiceImpl implements EmailService {
 
             Response response = sendGrid.api(request);
 
-            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+            int statusCode = response.getStatusCode();
+            String responseBody = response.getBody();
+
+            // SendGrid returns 202 for success
+            if (statusCode == 202) {
 
                 emailLogRepository.save(
                         EmailLog.builder()
@@ -101,22 +113,29 @@ public class EmailServiceImpl implements EmailService {
                                 .subject(subject)
                                 .status(EmailStatus.SUCCESS)
                                 .createdAt(LocalDateTime.now())
+                                .retryCount(0)
                                 .build()
                 );
 
-                log.info("Email sent successfully | publicId={}", publicId);
+                log.info("Email sent successfully | publicId={} | recipient={}", publicId, recipient);
 
             } else {
 
                 saveFailure(publicId, recipient, subject,
-                        "SendGrid response: " + response.getBody());
-
+                        "SendGrid status: " + statusCode + " | body: " + responseBody);
             }
 
-        } catch (IOException e) {
-            saveFailure(publicId, recipient, subject, e.getMessage());
+        } catch (IOException ex) {
+
+            saveFailure(publicId, recipient, subject, ex.getMessage());
+
+        } catch (Exception ex) {
+
+            saveFailure(publicId, recipient, subject, ex.getMessage());
         }
     }
+
+    // ================= FAILURE HANDLER =================
 
     private void saveFailure(String publicId,
                              String recipient,
@@ -136,6 +155,7 @@ public class EmailServiceImpl implements EmailService {
                         .build()
         );
 
-        log.error("Email failed | publicId={} | error={}", publicId, errorMessage);
+        log.error("Email failed | publicId={} | recipient={} | error={}",
+                publicId, recipient, errorMessage);
     }
 }
