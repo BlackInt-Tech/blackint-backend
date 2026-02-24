@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Contact {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
     private UUID id;
 
     @Column(unique = true)
