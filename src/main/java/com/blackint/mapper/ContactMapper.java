@@ -24,8 +24,7 @@ public class ContactMapper {
                 .phone(request.getPhone())
                 .company(request.getCompany())
                 .services(request.getServices() != null
-                        ? request.getServices().stream().collect(Collectors.joining(", "))
-                        : null)
+                        ? String.join(", ", request.getServices()): null)
                 .budget(request.getBudget())
                 .projectIdea(request.getProjectIdea())
                 .message(request.getMessage())

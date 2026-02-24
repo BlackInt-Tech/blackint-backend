@@ -16,6 +16,7 @@ import java.util.UUID;
 public class Contact {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)
     private UUID id;
 
@@ -35,7 +36,7 @@ public class Contact {
     private String subject;
 
     @Column(columnDefinition = "TEXT")
-    private String services; // store comma-separated OR JSON later
+    private String services;
 
     private String budget;
 
