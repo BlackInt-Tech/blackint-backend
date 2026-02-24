@@ -44,7 +44,7 @@ public class EmailServiceImpl implements EmailService {
         String subject = "We've received your message – BlackInt";
         String htmlContent = EmailTemplateBuilder.buildUserConfirmationTemplate(contact);
 
-        sendEmail(contact.getPublicId(), contact.getEmail(), subject, htmlContent);
+        sendEmail(contact.getPublicId(), contact.getEmail(), subject, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent);
     }
 
     // ================= ADMIN NOTIFICATION =================
@@ -56,7 +56,7 @@ public class EmailServiceImpl implements EmailService {
         String subject = "New Lead Received – " + contact.getSubject();
         String htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplate(contact);
 
-        sendEmail(contact.getPublicId(), adminEmail, subject, htmlContent);
+        sendEmail(contact.getPublicId(), adminEmail, subject, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent);
     }
 
     // ================= STATUS UPDATE =================
@@ -70,7 +70,7 @@ public class EmailServiceImpl implements EmailService {
         String subject = "Welcome Aboard – BlackInt 🚀";
         String htmlContent = EmailTemplateBuilder.buildConvertedTemplate(contact);
 
-        sendEmail(contact.getPublicId(), contact.getEmail(), subject, htmlContent);
+        sendEmail(contact.getPublicId(), contact.getEmail(), subject, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent, htmlContent);
     }
 
     // ================= CORE SEND METHOD =================
@@ -78,7 +78,15 @@ public class EmailServiceImpl implements EmailService {
     private void sendEmail(String publicId,
                            String recipient,
                            String subject,
-                           String htmlContent) {
+                           String htmlContent,
+                           String firstName,
+                           String lastName,
+                           String company,
+                           String phone,
+                           String services,
+                           String budget,
+                           String projectIdea,
+                           String message) {
 
         if (recipient == null || recipient.isBlank()) {
             log.error("Recipient email is null or empty | publicId={}", publicId);
@@ -107,31 +115,39 @@ public class EmailServiceImpl implements EmailService {
             if (statusCode == 202) {
 
                 emailLogRepository.save(
-                        EmailLog.builder()
-                                .publicId(publicId)
-                                .recipient(recipient)
-                                .subject(subject)
-                                .status(EmailStatus.SUCCESS)
-                                .createdAt(LocalDateTime.now())
-                                .retryCount(0)
-                                .build()
-                );
+                EmailLog.builder()
+                        .publicId(publicId)
+                        .recipient(recipient)
+                        .subject(subject)
+                        .status(EmailStatus.FAILED)
+                        .createdAt(LocalDateTime.now())
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .company(company)
+                        .phone(phone)
+                        .services(String.join(", ", services))
+                        .budget(budget)
+                        .projectIdea(projectIdea)
+                        .message(message)
+
+                        .build()
+        );
 
                 log.info("Email sent successfully | publicId={} | recipient={}", publicId, recipient);
 
             } else {
 
                 saveFailure(publicId, recipient, subject,
-                        "SendGrid status: " + statusCode + " | body: " + responseBody);
+                        "SendGrid status: " + statusCode + " | body: " + responseBody, responseBody, responseBody, responseBody, responseBody, responseBody, responseBody, responseBody, responseBody);
             }
 
         } catch (IOException ex) {
 
-            saveFailure(publicId, recipient, subject, ex.getMessage());
+            saveFailure(publicId, recipient, subject, ex.getMessage(), message, message, message, message, message, message, message, message);
 
         } catch (Exception ex) {
 
-            saveFailure(publicId, recipient, subject, ex.getMessage());
+            saveFailure(publicId, recipient, subject, ex.getMessage(), message, message, message, message, message, message, message, message);
         }
     }
 
@@ -140,7 +156,15 @@ public class EmailServiceImpl implements EmailService {
     private void saveFailure(String publicId,
                              String recipient,
                              String subject,
-                             String errorMessage) {
+                             String errorMessage,
+                             String firstName,
+                             String lastName,
+                             String company,
+                             String phone,
+                             String services,
+                             String budget,
+                             String projectIdea,
+                             String message) {
 
         emailLogRepository.save(
                 EmailLog.builder()
@@ -152,6 +176,15 @@ public class EmailServiceImpl implements EmailService {
                         .retryCount(0)
                         .nextRetryAt(LocalDateTime.now().plusMinutes(5))
                         .createdAt(LocalDateTime.now())
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .company(company)
+                        .phone(phone)
+                        .services(String.join(", ", services))
+                        .budget(budget)
+                        .projectIdea(projectIdea)
+                        .message(message)
+
                         .build()
         );
 

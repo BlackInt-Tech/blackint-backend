@@ -36,4 +36,21 @@ public class EmailLog {
     private Integer retryCount = 0;
 
     private LocalDateTime nextRetryAt;
+
+    private String firstName;
+    private String lastName;
+    private String phone;
+    private String company;
+
+    @Column(columnDefinition = "TEXT")
+    private String services;
+
+    private String budget;
+
+    @Column(columnDefinition = "TEXT")
+    private String projectIdea;
+
+    @Column(columnDefinition = "TEXT")
+    private String message;
+
 }
