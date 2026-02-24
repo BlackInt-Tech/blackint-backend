@@ -7,50 +7,54 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(
-    name = "contacts",
-    indexes = {
-        @Index(name = "idx_contact_email", columnList = "email"),
-        @Index(name = "idx_contact_status", columnList = "status"),
-        @Index(name = "idx_contact_created_at", columnList = "createdAt")
-    }
-)
+@Table(name = "contacts")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Contact {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
-    @Column(name = "public_id", unique = true, nullable = false, length = 32)
+    @Column(unique = true)
     private String publicId;
 
-    @Column(nullable = false)
-    private String fullName;
+    private String firstName;
 
-    @Column(nullable = false)
+    private String lastName;
+
     private String email;
 
     private String phone;
 
-    @Column(nullable = false)
+    private String company;
+
     private String subject;
+
+    @Column(columnDefinition = "TEXT")
+    private String services; // store comma-separated OR JSON later
+
+    private String budget;
+
+    @Column(columnDefinition = "TEXT")
+    private String projectIdea;
 
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    private String source;
+
+    private String ipAddress;
+
     @Enumerated(EnumType.STRING)
     private LeadStatus status;
-
-    private String source;
-    private String ipAddress;
 
     private Boolean isDeleted = false;
 
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 }

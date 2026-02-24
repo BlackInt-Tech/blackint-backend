@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,7 +59,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/images/**",
+                                "/css/**",
+                                "/js/**",
+                                "/api/auth/**"
                         ).permitAll()
 
                         // ================= PUBLIC CONTACT =================
@@ -108,4 +113,13 @@ public class SecurityConfig {
 
         return source;
         }
+
+        @Bean
+        public WebSecurityCustomizer webSecurityCustomizer() {
+                return web -> web.ignoring().requestMatchers(
+                        "/images/**",
+                        "/css/**",
+                        "/js/**"
+                );
+}
 }

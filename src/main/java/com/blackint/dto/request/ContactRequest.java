@@ -3,16 +3,22 @@ package com.blackint.dto.request;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ContactRequest {
 
-    @NotBlank(message = "Full name is required")
-    @Size(min = 2, max = 100, message = "Full name must be between 2 and 100 characters")
-    private String fullName;
+    @NotBlank(message = "First name is required")
+    @Size(min = 2, max = 100)
+    private String firstName;
+
+    @NotBlank(message = "Last name is required")
+    @Size(min = 2, max = 100)
+    private String lastName;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    @Size(max = 150, message = "Email must not exceed 150 characters")
+    @Email
+    @Size(max = 150)
     private String email;
 
     @Pattern(
@@ -21,11 +27,20 @@ public class ContactRequest {
     )
     private String phone;
 
-    @NotBlank(message = "Subject is required")
-    @Size(min = 3, max = 150, message = "Subject must be between 3 and 150 characters")
-    private String subject;
+    @NotBlank(message = "Company is required")
+    private String company;
+
+    @NotEmpty(message = "Select at least one service")
+    private List<String> services;
+
+    @NotBlank(message = "Budget is required")
+    private String budget;
+
+    @NotBlank(message = "Project idea is required")
+    @Size(min = 10, max = 3000)
+    private String projectIdea;
 
     @NotBlank(message = "Message is required")
-    @Size(min = 10, max = 2000, message = "Message must be between 10 and 2000 characters")
+    @Size(min = 10, max = 2000)
     private String message;
 }

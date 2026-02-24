@@ -7,10 +7,9 @@ import com.blackint.entity.LeadStatus;
 import com.blackint.utils.IdGenerator;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 public class ContactMapper {
-
-    // ================= ENTITY =================
 
     public static Contact toEntity(
             ContactRequest request,
@@ -19,10 +18,16 @@ public class ContactMapper {
     ) {
         return Contact.builder()
                 .publicId(IdGenerator.generate("LEAD"))
-                .fullName(request.getFullName())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
                 .email(request.getEmail())
                 .phone(request.getPhone())
-                .subject(request.getSubject())
+                .company(request.getCompany())
+                .services(request.getServices() != null
+                        ? request.getServices().stream().collect(Collectors.joining(", "))
+                        : null)
+                .budget(request.getBudget())
+                .projectIdea(request.getProjectIdea())
                 .message(request.getMessage())
                 .status(LeadStatus.NEW)
                 .source(source != null ? source : "WEBSITE")
@@ -33,15 +38,17 @@ public class ContactMapper {
                 .build();
     }
 
-    // ================= RESPONSE =================
-
     public static ContactResponse toResponse(Contact contact) {
         return ContactResponse.builder()
                 .publicId(contact.getPublicId())
-                .fullName(contact.getFullName())
+                .firstName(contact.getFirstName())
+                .lastName(contact.getLastName())
                 .email(contact.getEmail())
                 .phone(contact.getPhone())
-                .subject(contact.getSubject())
+                .company(contact.getCompany())
+                .services(contact.getServices())
+                .budget(contact.getBudget())
+                .projectIdea(contact.getProjectIdea())
                 .message(contact.getMessage())
                 .status(contact.getStatus())
                 .source(contact.getSource())

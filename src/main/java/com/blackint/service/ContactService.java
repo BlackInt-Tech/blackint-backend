@@ -53,8 +53,8 @@ public class ContactService {
             result = repository.findByIsDeletedFalseAndStatus(status, pageable);
         } else if (search != null && !search.isBlank()) {
             result = repository
-                    .findByIsDeletedFalseAndFullNameContainingIgnoreCaseOrIsDeletedFalseAndEmailContainingIgnoreCase(
-                            search, search, pageable);
+                .findByIsDeletedFalseAndFirstNameContainingIgnoreCaseOrIsDeletedFalseAndLastNameContainingIgnoreCaseOrIsDeletedFalseAndEmailContainingIgnoreCase(
+                        search, search, search, pageable);
         } else {
             result = repository.findByIsDeletedFalse(pageable);
         }

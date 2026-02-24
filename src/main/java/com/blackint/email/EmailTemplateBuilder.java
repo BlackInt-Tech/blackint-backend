@@ -4,7 +4,12 @@ import com.blackint.entity.Contact;
 
 public class EmailTemplateBuilder {
 
-    private static final String LOGO_URL = "https://blackint-dev.onrender.com/images/logo.png";
+    private static final String logo_url = "https://blackint-dev.onrender.com/images/logo.png";
+    private static final String fb_icon = "https://blackint-dev.onrender.com/images/facebook.png";
+    private static final String insta_icon = "https://blackint-dev.onrender.com/images/insta.png";
+    private static final String linkedin_icon = "https://blackint-dev.onrender.com/images/linkedin.png";
+    private static final String twitter_icon = "https://blackint-dev.onrender.com/images/twitter.png";
+    private static final String welcome_image = "https://blackint-dev.onrender.com/images/email-welcome.jpg";
 
     public static String buildUserConfirmationTemplate(Contact contact) {
 
@@ -52,7 +57,7 @@ public class EmailTemplateBuilder {
                             <!-- ================= IMAGE ================= -->
                             <tr>
                                 <td align="center">
-                                    <img src="https://blackint-dev.onrender.com/images/logo.png"
+                                    <img src="%s"
                                         width="620"
                                         style="width:100%%;max-width:620px;display:block;"
                                         alt="BlackInt Welcome"/>
@@ -161,15 +166,19 @@ public class EmailTemplateBuilder {
                                     <!-- Social Links -->
                                     <div style="margin-top:15px;">
                                         <a href="https://instagram.com" style="margin:0 6px;">
-                                            <img src="https://blackint.tech/icons/instagram.png"
+                                            <img src="%s"
                                                 width="18" style="opacity:0.8;"/>
                                         </a>
                                         <a href="https://linkedin.com" style="margin:0 6px;">
-                                            <img src="https://blackint.tech/icons/linkedin.png"
+                                            <img src="%s"
+                                                width="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://facebook.com" style="margin:0 6px;">
+                                            <img src="%s"
                                                 width="18" style="opacity:0.8;"/>
                                         </a>
                                         <a href="https://twitter.com" style="margin:0 6px;">
-                                            <img src="https://blackint.tech/icons/twitter.png"
+                                            <img src="%s"
                                                 width="18" style="opacity:0.8;"/>
                                         </a>
                                     </div>
@@ -190,8 +199,13 @@ public class EmailTemplateBuilder {
         </body>
         </html>
     """.formatted(
-            contact.getFullName(),
-            contact.getSubject()
+            contact.getFirstName() + " " + contact.getLastName(),
+            welcome_image,
+            contact.getSubject(),
+            insta_icon,
+            linkedin_icon,
+            fb_icon,
+            twitter_icon
     );
 }
 
@@ -274,7 +288,7 @@ public class EmailTemplateBuilder {
         </body>
         </html>
         """.formatted(
-                contact.getFullName(),
+                contact.getFirstName() + " " + contact.getLastName(),
                 contact.getEmail(),
                 contact.getPhone(),
                 contact.getSubject(),
@@ -330,7 +344,7 @@ public static String buildConvertedTemplate(Contact contact) {
                         <!-- ================= HERO IMAGE ================= -->
                         <tr>
                             <td align="center">
-                                <img src="https://blackint.tech/email-welcome.jpg"
+                                <img src="%s"
                                      width="620"
                                      style="width:100%%;max-width:620px;display:block;"
                                      alt="BlackInt Welcome"/>
@@ -428,6 +442,27 @@ public static String buildConvertedTemplate(Contact contact) {
                                     Greater Noida, Uttar Pradesh, India
                                 </p>
 
+                                <!-- Social Links -->
+                                    <div style="margin-top:15px;">
+                                        <a href="https://instagram.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://linkedin.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://facebook.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://twitter.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" style="opacity:0.8;"/>
+                                        </a>
+                                    </div>
+
+
                                 <p style="margin:8px 0;">
                                     <a href="https://blackint.tech/privacy"
                                        style="color:#777777;text-decoration:none;margin:0 8px;">
@@ -454,6 +489,14 @@ public static String buildConvertedTemplate(Contact contact) {
 
     </body>
     </html>
-    """.formatted(contact.getFullName());
+    """.formatted(
+            contact.getFirstName() + " " + contact.getLastName(),
+            welcome_image,
+            insta_icon,
+            linkedin_icon,
+            fb_icon,
+            twitter_icon
+            
+    );
     }
 }

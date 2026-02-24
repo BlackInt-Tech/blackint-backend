@@ -12,11 +12,17 @@ public class ContactResponse {
 
     private String publicId;
 
-    private String fullName;
+    private String firstName;
+    private String lastName;
+
     private String email;
     private String phone;
+    private String company;
 
-    private String subject;
+    private String services;
+    private String budget;
+    private String projectIdea;
+
     private String message;
 
     private LeadStatus status;
