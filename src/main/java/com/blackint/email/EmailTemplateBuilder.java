@@ -46,9 +46,9 @@ public class EmailTemplateBuilder {
             <title>Welcome to BlackInt</title>
         </head>
 
-        <body style="margin:0;padding:0;background:#0B0B0B;font-family:Arial,Helvetica,sans-serif;">
+        <body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
 
-            <table width="100%%" cellpadding="0" cellspacing="0" style="padding:40px 0;background:#0B0B0B;">
+            <table width="100%%" cellpadding="0" cellspacing="0" style="padding:40px 0;background:#ffffff;">
                 <tr>
                     <td align="center">
 
@@ -249,7 +249,7 @@ public class EmailTemplateBuilder {
             <title>New Lead - BlackInt</title>
         </head>
 
-        <body style="margin:0;padding:0;background:#0B0B0B;font-family:Arial,Helvetica,sans-serif;">
+        <body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
 
             <table width="100%%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
                 <tr>
@@ -338,9 +338,9 @@ public static String buildConvertedTemplate(Contact contact) {
         <title>Welcome to BlackInt</title>
     </head>
 
-    <body style="margin:0;padding:0;background:#0B0B0B;font-family:Arial,Helvetica,sans-serif;">
+    <body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
 
-        <table width="100%%" cellpadding="0" cellspacing="0" style="padding:40px 0;background:#0B0B0B;">
+        <table width="100%%" cellpadding="0" cellspacing="0" style="padding:40px 0;background:#ffffff;">
             <tr>
                 <td align="center">
 
