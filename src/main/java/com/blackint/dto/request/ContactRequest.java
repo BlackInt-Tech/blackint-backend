@@ -43,4 +43,6 @@ public class ContactRequest {
     @NotBlank(message = "Message is required")
     @Size(min = 10, max = 2000)
     private String message;
+
+    
 }

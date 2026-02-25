@@ -50,7 +50,11 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendAdminNotification(Contact contact) {
 
-        String subject = "New Lead Received – " + contact.getServices();
+        String subject = "New Lead – "
+                + contact.getFirstName() + " "
+                + contact.getLastName()
+                + " | "
+                + contact.getServices();
         String htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplate(contact);
 
         sendEmail(contact, subject, adminEmail, htmlContent);

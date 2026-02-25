@@ -10,8 +10,32 @@ public class EmailTemplateBuilder {
     private static final String linkedin_icon = "https://blackint-dev.onrender.com/images/linkedin.png";
     private static final String twitter_icon = "https://blackint-dev.onrender.com/images/twitter.png";
     private static final String welcome_image = "https://blackint-dev.onrender.com/images/email-welcome.jpg";
+    private static final String hero_image = "https://blackint-dev.onrender.com/images/hero-image.png";
 
+    private static String formatServices(String services) {
+
+        if (services == null || services.isBlank()) {
+            return "<div style='color:#777;'>No services selected</div>";
+        }
+
+        String[] servicesArray = services.split(",");
+
+        StringBuilder builder = new StringBuilder();
+
+        for (String service : servicesArray) {
+            builder.append("""
+                <div style="margin-bottom:6px;">
+                    • <span style="color:#FFFFFF;">%s</span>
+                </div>
+            """.formatted(service.trim()));
+        }
+
+        return builder.toString();
+    }
+    
     public static String buildUserConfirmationTemplate(Contact contact) {
+
+        String servicesHtml = formatServices(contact.getServices());
 
     return """
         <!DOCTYPE html>
@@ -36,10 +60,10 @@ public class EmailTemplateBuilder {
                                 <td align="center" style="padding:40px 20px 30px 20px;">
 
                                     <!-- Brand -->
-                                    "<div style='font-size:26px;font-weight:800;letter-spacing:1px;display:flex;align-items:center;'>"
-                                    + "<img src='" + logo_url + "' alt='BlackInt Logo' style='height:30px;margin-right:6px;'>"
-                                    + "<span style='color:#FFFFFF;'>Black</span><span style='color:#FF4D00;'>Int</span>"
-                                    + "</div>"
+                                    <div style="font-size:26px;font-weight:800;letter-spacing:1px;">
+                                        <img src="%s" style="height:30px;vertical-align:middle;margin-right:6px;">
+                                        <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>                                      
+                                    </div>
 
                                     <!-- Welcome -->
                                     <h1 style="color:#FF4D00;margin:25px 0 10px 0;font-size:20px;">
@@ -76,7 +100,7 @@ public class EmailTemplateBuilder {
                                                 border-radius:6px;
                                                 margin:20px 0;
                                                 color:#FFFFFF;">
-                                        <strong>%s</strong>
+                                        %s
                                     </div>
 
                                     <p>
@@ -134,7 +158,7 @@ public class EmailTemplateBuilder {
                                     </p>
 
                                     <p style="margin:0;color:#FFFFFF;font-weight:bold;">
-                                        BlackInt Strategy Team 🚀
+                                        BlackInt Strategy Team
                                     </p>
 
                                 </td>
@@ -202,7 +226,7 @@ public class EmailTemplateBuilder {
             logo_url,
             contact.getFirstName() + " " + contact.getLastName(),
             welcome_image,
-            contact.getServices(),
+            servicesHtml,
             insta_icon,
             linkedin_icon,
             fb_icon,
@@ -212,6 +236,8 @@ public class EmailTemplateBuilder {
 
 
     public static String buildAdminNotificationTemplate(Contact contact) {
+
+        String servicesHtml = formatServices(contact.getServices());
 
     return """
         <!DOCTYPE html>
@@ -235,12 +261,11 @@ public class EmailTemplateBuilder {
                             <tr>
                                 <td align="center" style="padding:30px;">
                                     <div style="font-size:26px;font-weight:800;letter-spacing:1px;">
-                                        <img src="%s" alt="BlackInt Logo" style="height:30px;vertical-align:middle;margin-right:6px;">
-                                        <span style="color:#FFFFFF;">Black</span>
-                                        <span style="color:#FF4D00;">Int</span>
+                                        <img src="%s" style="height:30px;vertical-align:middle;margin-right:6px;">
+                                        <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>                                      
                                     </div>
                                     <h2 style="color:#FF4D00;margin-top:20px;">
-                                        New Lead Received 🚀
+                                        New Lead Received
                                     </h2>
                                 </td>
                             </tr>
@@ -254,17 +279,15 @@ public class EmailTemplateBuilder {
                                         <p><strong style="color:#FFFFFF;">Name:</strong> %s</p>
                                         <p><strong style="color:#FFFFFF;">Email:</strong> %s</p>
                                         <p><strong style="color:#FFFFFF;">Phone:</strong> %s</p>
-                                        <p><strong style="color:#FFFFFF;">Subject:</strong> %s</p>
+                                        <p style="margin-top:20px;"><strong style="color:#FFFFFF;">Message:</strong></p>
+                                        <div style="background:#1A1A1A;
+                                                    padding:18px;
+                                                    border-left:4px solid #FF4D00;
+                                                    border-radius:6px;">
+                                            %s
+                                        </div>
+                                        <p><strong style="color:#FFFFFF;">Project Desc.:</strong> %s</p>
 
-                                    </div>
-
-                                    <p style="margin-top:20px;"><strong style="color:#FFFFFF;">Message:</strong></p>
-
-                                    <div style="background:#1A1A1A;
-                                                padding:18px;
-                                                border-left:4px solid #FF4D00;
-                                                border-radius:6px;">
-                                        %s
                                     </div>
 
                                     <p style="margin-top:25px;font-size:12px;color:#777;">
@@ -294,14 +317,16 @@ public class EmailTemplateBuilder {
                 contact.getFirstName() + " " + contact.getLastName(),
                 contact.getEmail(),
                 contact.getPhone(),
-                contact.getServices(),
-                contact.getMessage(),
+                contact.getProjectIdea(),
+                servicesHtml,
                 contact.getPublicId()
         );
     }
 
 
 public static String buildConvertedTemplate(Contact contact) {
+
+    String servicesHtml = formatServices(contact.getServices());
 
     return """
     <!DOCTYPE html>
@@ -327,9 +352,8 @@ public static String buildConvertedTemplate(Contact contact) {
 
                                 <!-- Brand -->
                                 <div style="font-size:26px;font-weight:800;letter-spacing:1px;">
-                                    <img src="%s" alt="BlackInt Logo" style="height:30px;vertical-align:middle;margin-right:6px;">
-                                    <span style="color:#FFFFFF;">Black</span>
-                                    <span style="color:#FF4D00;">Int</span>
+                                    <img src="%s" style="height:30px;vertical-align:middle;margin-right:6px;">
+                                    <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>
                                 </div>
 
                                 <!-- Welcome -->
@@ -362,6 +386,15 @@ public static String buildConvertedTemplate(Contact contact) {
                                 <p>
                                     Our strategy team will reach out shortly to begin onboarding
                                     and align on next steps for your project.
+
+                                    <div style="background:#1A1A1A;
+                                                padding:18px;
+                                                border-left:4px solid #FF4D00;
+                                                border-radius:6px;
+                                                margin:20px 0;
+                                                color:#FFFFFF;">
+                                        %s
+                                    </div>
                                 </p>
 
                                 <div style="background:#1A1A1A;
@@ -428,7 +461,7 @@ public static String buildConvertedTemplate(Contact contact) {
                                 </p>
 
                                 <p style="margin:0;color:#FFFFFF;font-weight:bold;">
-                                    BlackInt Strategy Team 🚀
+                                    BlackInt Strategy Team
                                 </p>
 
                             </td>
@@ -496,7 +529,8 @@ public static String buildConvertedTemplate(Contact contact) {
     """.formatted(
             logo_url,
             contact.getFirstName() + " " + contact.getLastName(),
-            welcome_image,
+            hero_image,
+            servicesHtml,
             insta_icon,
             linkedin_icon,
             fb_icon,
