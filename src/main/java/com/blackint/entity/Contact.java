@@ -45,7 +45,7 @@ public class Contact {
     private String message;
 
     private String source;
-
+    private String subject;
     private String ipAddress;
 
     @Enumerated(EnumType.STRING)

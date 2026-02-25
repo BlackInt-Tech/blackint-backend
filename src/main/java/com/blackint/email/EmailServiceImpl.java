@@ -53,7 +53,7 @@ public class EmailServiceImpl implements EmailService {
         String subject = "New Lead Received – " + contact.getSubject();
         String htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplate(contact);
 
-        sendEmail(contact, adminEmail, subject, htmlContent);
+        sendEmail(contact, adminEmail,subject, htmlContent);
     }
 
     // ================= STATUS UPDATE =================
@@ -75,8 +75,8 @@ public class EmailServiceImpl implements EmailService {
     // ================= CORE SEND METHOD =================
 
     private void sendEmail(Contact contact,
-                           String recipient,
                            String subject,
+                           String recipient,
                            String htmlContent) {
 
         if (recipient == null || recipient.isBlank()) {
@@ -105,7 +105,6 @@ public class EmailServiceImpl implements EmailService {
                         EmailLog.builder()
                                 .publicId(contact.getPublicId())
                                 .recipient(recipient)
-                                .subject(subject)
                                 .status(EmailStatus.SUCCESS)
                                 .createdAt(LocalDateTime.now())
                                 .firstName(contact.getFirstName())
@@ -126,13 +125,13 @@ public class EmailServiceImpl implements EmailService {
 
             } else {
 
-                saveFailure(contact, recipient, subject,
+                saveFailure(contact, recipient,
                         "SendGrid response: " + response.getBody());
             }
 
         } catch (Exception ex) {
 
-            saveFailure(contact, recipient, subject, ex.getMessage());
+            saveFailure(contact, recipient, ex.getMessage());
         }
     }
 
@@ -140,14 +139,12 @@ public class EmailServiceImpl implements EmailService {
 
     private void saveFailure(Contact contact,
                              String recipient,
-                             String subject,
                              String errorMessage) {
 
         emailLogRepository.save(
                 EmailLog.builder()
                         .publicId(contact.getPublicId())
                         .recipient(recipient)
-                        .subject(subject)
                         .status(EmailStatus.FAILED)
                         .errorMessage(errorMessage)
                         .retryCount(0)
