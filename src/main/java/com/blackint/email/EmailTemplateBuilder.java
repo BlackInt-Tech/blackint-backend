@@ -71,7 +71,8 @@ public class EmailTemplateBuilder {
                                     </h1>
 
                                     <p style="color:#CCCCCC;font-size:15px;max-width:480px;">
-                                        Thank you for reaching out to <strong style="color:#FFFFFF;">BlackInt</strong>.</br>
+                                        Thank you for reaching out to <strong style="color:#FFFFFF;">BlackInt</strong>
+                                        </br>
                                         We're excited to explore your vision.
                                     </p>
 
