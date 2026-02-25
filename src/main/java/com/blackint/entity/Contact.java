@@ -33,8 +33,6 @@ public class Contact {
 
     private String company;
 
-    private String subject;
-
     @Column(columnDefinition = "TEXT")
     private String services;
 
