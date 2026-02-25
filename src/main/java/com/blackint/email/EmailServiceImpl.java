@@ -41,7 +41,7 @@ public class EmailServiceImpl implements EmailService {
         String subject = "We've received your message – BlackInt";
         String htmlContent = EmailTemplateBuilder.buildUserConfirmationTemplate(contact);
 
-        sendEmail(contact, contact.getEmail(), subject, htmlContent);
+        sendEmail(contact, subject, contact.getEmail(), htmlContent);
     }
 
     // ================= ADMIN NOTIFICATION =================
@@ -50,10 +50,10 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendAdminNotification(Contact contact) {
 
-        String subject = "New Lead Received – " + contact.getSubject();
+        String subject = "New Lead Received – " + contact.getServices();
         String htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplate(contact);
 
-        sendEmail(contact, adminEmail,subject, htmlContent);
+        sendEmail(contact, subject, adminEmail, htmlContent);
     }
 
     // ================= STATUS UPDATE =================
@@ -69,7 +69,7 @@ public class EmailServiceImpl implements EmailService {
         String subject = "Welcome Aboard – BlackInt 🚀";
         String htmlContent = EmailTemplateBuilder.buildConvertedTemplate(contact);
 
-        sendEmail(contact, contact.getEmail(), subject, htmlContent);
+        sendEmail(contact, subject, contact.getEmail(), htmlContent);
     }
 
     // ================= CORE SEND METHOD =================
@@ -99,21 +99,23 @@ public class EmailServiceImpl implements EmailService {
 
             Response response = sendGrid.api(request);
 
+            log.info("SendGrid Response Code: {}", response.getStatusCode());
+            log.info("SendGrid Response Body: {}", response.getBody());
+
             if (response.getStatusCode() == 202) {
 
                 emailLogRepository.save(
                         EmailLog.builder()
                                 .publicId(contact.getPublicId())
                                 .recipient(recipient)
+                                .subject(subject)
                                 .status(EmailStatus.SUCCESS)
                                 .createdAt(LocalDateTime.now())
                                 .firstName(contact.getFirstName())
                                 .lastName(contact.getLastName())
                                 .company(contact.getCompany())
                                 .phone(contact.getPhone())
-                                .services(contact.getServices() != null
-                                        ? String.join(", ", contact.getServices())
-                                        : null)
+                                .services(contact.getServices())
                                 .budget(contact.getBudget())
                                 .projectIdea(contact.getProjectIdea())
                                 .message(contact.getMessage())
@@ -125,13 +127,13 @@ public class EmailServiceImpl implements EmailService {
 
             } else {
 
-                saveFailure(contact, recipient,
+                saveFailure(contact, recipient, subject,
                         "SendGrid response: " + response.getBody());
             }
 
         } catch (Exception ex) {
 
-            saveFailure(contact, recipient, ex.getMessage());
+            saveFailure(contact, recipient, subject, ex.getMessage());
         }
     }
 
@@ -139,12 +141,14 @@ public class EmailServiceImpl implements EmailService {
 
     private void saveFailure(Contact contact,
                              String recipient,
+                             String subject,
                              String errorMessage) {
 
         emailLogRepository.save(
                 EmailLog.builder()
                         .publicId(contact.getPublicId())
                         .recipient(recipient)
+                        .subject(subject)
                         .status(EmailStatus.FAILED)
                         .errorMessage(errorMessage)
                         .retryCount(0)
@@ -154,9 +158,7 @@ public class EmailServiceImpl implements EmailService {
                         .lastName(contact.getLastName())
                         .company(contact.getCompany())
                         .phone(contact.getPhone())
-                        .services(contact.getServices() != null
-                                ? String.join(", ", contact.getServices())
-                                : null)
+                        .services(contact.getServices())
                         .budget(contact.getBudget())
                         .projectIdea(contact.getProjectIdea())
                         .message(contact.getMessage())

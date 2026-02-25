@@ -234,10 +234,11 @@ public class EmailTemplateBuilder {
                             <!-- HEADER -->
                             <tr>
                                 <td align="center" style="padding:30px;">
-                                    "<div style='font-size:26px;font-weight:800;letter-spacing:1px;display:flex;align-items:center;'>"
-                                    + "<img src='" + logo_url + "' alt='BlackInt Logo' style='height:30px;margin-right:6px;'>"
-                                    + "<span style='color:#FFFFFF;'>Black</span><span style='color:#FF4D00;'>Int</span>"
-                                    + "</div>"
+                                    <div style="font-size:26px;font-weight:800;letter-spacing:1px;">
+                                        <img src="%s" alt="BlackInt Logo" style="height:30px;vertical-align:middle;margin-right:6px;">
+                                        <span style="color:#FFFFFF;">Black</span>
+                                        <span style="color:#FF4D00;">Int</span>
+                                    </div>
                                     <h2 style="color:#FF4D00;margin-top:20px;">
                                         New Lead Received 🚀
                                     </h2>
@@ -325,10 +326,11 @@ public static String buildConvertedTemplate(Contact contact) {
                             <td align="center" style="padding:40px 20px 30px 20px;">
 
                                 <!-- Brand -->
-                                "<div style='font-size:26px;font-weight:800;letter-spacing:1px;display:flex;align-items:center;'>"
-                                + "<img src='" + logo_url + "' alt='BlackInt Logo' style='height:30px;margin-right:6px;'>"
-                                + "<span style='color:#FFFFFF;'>Black</span><span style='color:#FF4D00;'>Int</span>"
-                                + "</div>"
+                                <div style="font-size:26px;font-weight:800;letter-spacing:1px;">
+                                    <img src="%s" alt="BlackInt Logo" style="height:30px;vertical-align:middle;margin-right:6px;">
+                                    <span style="color:#FFFFFF;">Black</span>
+                                    <span style="color:#FF4D00;">Int</span>
+                                </div>
 
                                 <!-- Welcome -->
                                 <h1 style="color:#FF4D00;margin:25px 0 10px 0;font-size:26px;">
