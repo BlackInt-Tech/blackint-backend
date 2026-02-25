@@ -6,7 +6,7 @@ public class EmailTemplateBuilder {
 
     private static final String logo_url = "https://blackint-dev.onrender.com/images/logo.png";
     private static final String fb_icon = "https://blackint-dev.onrender.com/images/facebook.png";
-    private static final String insta_icon = "https://blackint-dev.onrender.com/images/insta.png";
+    private static final String insta_icon = "https://blackint-dev.onrender.com/images/instagram.png";
     private static final String linkedin_icon = "https://blackint-dev.onrender.com/images/linkedin.png";
     private static final String twitter_icon = "https://blackint-dev.onrender.com/images/twitter.png";
     private static final String welcome_image = "https://blackint-dev.onrender.com/images/email-welcome.jpg";
@@ -71,8 +71,7 @@ public class EmailTemplateBuilder {
                                     </h1>
 
                                     <p style="color:#CCCCCC;font-size:15px;max-width:480px;">
-                                        Thank you for reaching out to <strong style="color:#FFFFFF;">BlackInt</strong>
-                                        </br>
+                                        Thank you for reaching out to <strong style="color:#FFFFFF;">BlackInt.</strong></br>
                                         We're excited to explore your vision.
                                     </p>
 
@@ -105,8 +104,7 @@ public class EmailTemplateBuilder {
                                     </div>
 
                                     <p>
-                                        Our strategy team is reviewing your request.
-                                        You can expect a detailed response within
+                                        Our strategy team is reviewing your request. You can expect callback within
                                         <strong style="color:#FFFFFF;">24 hours</strong>.
                                     </p>
 
@@ -192,19 +190,19 @@ public class EmailTemplateBuilder {
                                     <div style="margin-top:15px;">
                                         <a href="https://instagram.com" style="margin:0 6px;">
                                             <img src="%s"
-                                                width="18" style="opacity:0.8;"/>
+                                                width="18" height="18" style="opacity:0.8;"/>
                                         </a>
                                         <a href="https://linkedin.com" style="margin:0 6px;">
                                             <img src="%s"
-                                                width="18" style="opacity:0.8;"/>
+                                                width="18" height="18" style="opacity:0.8;"/>
                                         </a>
                                         <a href="https://facebook.com" style="margin:0 6px;">
                                             <img src="%s"
-                                                width="18" style="opacity:0.8;"/>
+                                                width="18" height="18" style="opacity:0.8;"/>
                                         </a>
                                         <a href="https://twitter.com" style="margin:0 6px;">
                                             <img src="%s"
-                                                width="18" style="opacity:0.8;"/>
+                                                width="18" height="18" style="opacity:0.8;"/>
                                         </a>
                                     </div>
 
@@ -362,9 +360,9 @@ public static String buildConvertedTemplate(Contact contact) {
                                     Welcome Aboard %s 🎉
                                 </h1>
 
-                                <p style="color:#CCCCCC;font-size:15px;max-width:480px;">
-                                    We're excited to officially start working with you.</br>
-                                    This is where strategy meets execution.
+                                <p style="color:#CCCCCC;font-size:15px;max-width:480px;line-height:1.6;margin:0 auto;">
+                                    We're excited to officially begin working with you.<br>
+                                    Our team is ready to turn your ideas into impactful digital solutions.
                                 </p>
 
                             </td>
@@ -477,19 +475,19 @@ public static String buildConvertedTemplate(Contact contact) {
                                     <div style="margin-top:15px;">
                                         <a href="https://instagram.com" style="margin:0 6px;">
                                             <img src="%s"
-                                                width="18" style="opacity:0.8;"/>
+                                                width="18" height="18" style="opacity:0.8;"/>
                                         </a>
                                         <a href="https://linkedin.com" style="margin:0 6px;">
                                             <img src="%s"
-                                                width="18" style="opacity:0.8;"/>
+                                                width="18" height="18" style="opacity:0.8;"/>
                                         </a>
                                         <a href="https://facebook.com" style="margin:0 6px;">
                                             <img src="%s"
-                                                width="18" style="opacity:0.8;"/>
+                                                width="18" height="18" style="opacity:0.8;"/>
                                         </a>
                                         <a href="https://twitter.com" style="margin:0 6px;">
                                             <img src="%s"
-                                                width="18" style="opacity:0.8;"/>
+                                                width="18" height="18" style="opacity:0.8;"/>
                                         </a>
                                     </div>
 
