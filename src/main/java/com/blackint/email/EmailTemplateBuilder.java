@@ -60,8 +60,8 @@ public class EmailTemplateBuilder {
                                 <td align="center" style="padding:40px 20px 30px 20px;">
 
                                     <!-- Brand -->
-                                    <div style="font-size:38px;font-weight:800;letter-spacing:0.2px;">
-                                        <img src="%s" style="height:30px;vertical-align:middle;margin-right:6px;">
+                                    <div style="font-size:26px;font-weight:800;letter-spacing:0.2px;">
+                                        <img src="%s" style="height:40px;vertical-align:middle;margin-right:6px;">
                                         <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>                                      
                                     </div>
 
@@ -93,7 +93,7 @@ public class EmailTemplateBuilder {
                                 <td style="padding:35px 40px;color:#CCCCCC;font-size:15px;line-height:1.7;">
 
                                     <p>We’ve received your inquiry regarding:</p>
-                                    <p><strong style="color:#FFFFFF;">Project Desc.</strong> %s</p>
+                                    <p><strong style="color:#FFFFFF;">Services :</strong></p>
                                     <div style="background:#1A1A1A;
                                                 padding:18px;
                                                 border-left:4px solid #FF4D00;
@@ -260,8 +260,8 @@ public class EmailTemplateBuilder {
                             <!-- HEADER -->
                             <tr>
                                 <td align="center" style="padding:30px;">
-                                    <div style="font-size:38px;font-weight:800;letter-spacing:0.2px;">
-                                        <img src="%s" style="height:30px;vertical-align:middle;margin-right:6px;">
+                                    <div style="font-size:26px;font-weight:800;letter-spacing:0.2px;">
+                                        <img src="%s" style="height:40px;vertical-align:middle;margin-right:6px;">
                                         <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>                                      
                                     </div>
                                     <h2 style="color:#FF4D00;margin-top:20px;">
@@ -279,14 +279,14 @@ public class EmailTemplateBuilder {
                                         <p><strong style="color:#FFFFFF;">Name:</strong> %s</p>
                                         <p><strong style="color:#FFFFFF;">Email:</strong> %s</p>
                                         <p><strong style="color:#FFFFFF;">Phone:</strong> %s</p>
-                                        <p><strong style="color:#FFFFFF;">Project Desc.</strong> %s</p>
+                                        <p><strong style="color:#FFFFFF;">Services :</strong></p>
                                         <div style="background:#1A1A1A;
                                                     padding:18px;
                                                     border-left:4px solid #FF4D00;
                                                     border-radius:6px;">
                                             %s
                                         </div>
-                                        <p style="margin-top:20px;"><strong style="color:#FFFFFF;">Message:</strong></p>
+                                        <p style="margin-top:20px;"><strong style="color:#FFFFFF;">Project Desc. :</strong>%s</p>
 
                                     </div>
 
@@ -317,8 +317,8 @@ public class EmailTemplateBuilder {
                 contact.getFirstName() + " " + contact.getLastName(),
                 contact.getEmail(),
                 contact.getPhone(),
-                contact.getProjectIdea(),
                 servicesHtml,
+                contact.getProjectIdea(),
                 contact.getPublicId()
         );
     }
@@ -351,8 +351,8 @@ public static String buildConvertedTemplate(Contact contact) {
                             <td align="center" style="padding:40px 20px 30px 20px;">
 
                                 <!-- Brand -->
-                                <div style="font-size:38px;font-weight:800;letter-spacing:0.2px;">
-                                    <img src="%s" style="height:30px;vertical-align:middle;margin-right:6px;">
+                                <div style="font-size:26px;font-weight:800;letter-spacing:0.2px;">
+                                    <img src="%s" style="height:40px;vertical-align:middle;margin-right:6px;">
                                     <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>
                                 </div>
 
@@ -387,7 +387,7 @@ public static String buildConvertedTemplate(Contact contact) {
                                     Our strategy team will reach out shortly to begin onboarding
                                     and align on next steps for your project.
 
-                                    <p><strong style="color:#FFFFFF;">Project Desc.</strong> %s</p>
+                                    <p><strong style="color:#FFFFFF;">Services : </strong></p>
                                     <div style="background:#1A1A1A;
                                                 padding:18px;
                                                 border-left:4px solid #FF4D00;
