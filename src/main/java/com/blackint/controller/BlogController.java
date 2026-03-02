@@ -8,14 +8,11 @@ import com.blackint.service.BlogService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/blogs")
@@ -26,7 +23,7 @@ public class BlogController {
 
     // ================= PUBLIC =================
 
-    @GetMapping("/published")
+    @GetMapping("/getPublished")
     public ApiResponse<List<BlogResponse>> getPublished(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -36,12 +33,12 @@ public class BlogController {
         );
     }
 
-    @GetMapping("/{slug}")
+    @GetMapping("/getBySlug/{slug}")
     public ApiResponse<BlogResponse> getBySlug(@PathVariable String slug) {
         return ApiResponse.success(blogService.getBySlug(slug));
     }
 
-    @GetMapping("/featured")
+    @GetMapping("/getFeatured")
     public ApiResponse<List<BlogResponse>> getFeatured(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
@@ -50,7 +47,7 @@ public class BlogController {
             blogService.getFeatured(page, size).getContent());    
     }
 
-    @GetMapping("/category/{slug}")
+    @GetMapping("/getByCategory/{slug}")
     public ApiResponse<List<BlogResponse>> getByCategory(
             @PathVariable String slug,
             @RequestParam(defaultValue = "0") int page,
@@ -60,7 +57,7 @@ public class BlogController {
             blogService.getFeatured(page, size).getContent());    
         }
 
-    @GetMapping("/tag/{slug}")
+    @GetMapping("/getByTag/{slug}")
     public ApiResponse<List<BlogResponse>> getByTag(
             @PathVariable String slug,
             @RequestParam(defaultValue = "0") int page,

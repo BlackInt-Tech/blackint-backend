@@ -64,12 +64,12 @@ public class OfferingController {
     }
 
     // ================= PUBLIC =================
-    @GetMapping("/published")
+    @GetMapping("/getPublished")
     public ApiResponse<List<OfferingResponse>> getPublished() {
         return ApiResponse.success(service.getPublished());
     }
 
-    @GetMapping("/slug/{slug}")
+    @GetMapping("/getBySlug/{slug}")
     public ApiResponse<OfferingResponse> getBySlug(
             @PathVariable String slug
     ) {
@@ -78,7 +78,7 @@ public class OfferingController {
 
     // ================= ADMIN VIEW ALL =================
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/all")
+    @GetMapping("/getAll")
     public ApiResponse<List<OfferingResponse>> getAllForAdmin() {
         return ApiResponse.success(service.getAllForAdmin());
     }

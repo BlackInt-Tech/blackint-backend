@@ -4,6 +4,7 @@ import com.blackint.entity.ProjectStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +21,8 @@ public class ProjectResponse {
     private String fullContent;
 
     private String featuredImage;
+    private List<String> galleryImages;
+
     private String clientName;
     private String projectUrl;
 

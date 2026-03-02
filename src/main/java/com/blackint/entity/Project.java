@@ -3,6 +3,7 @@ package com.blackint.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -42,6 +43,9 @@ public class Project {
 
     @Column(name = "featured_image")
     private String featuredImage;
+
+    @Column(name = "gallery_Images", columnDefinition = "TEXT")
+    private String galleryImages;
 
     private String clientName;
 

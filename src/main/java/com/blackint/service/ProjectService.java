@@ -9,6 +9,7 @@ import com.blackint.exception.SlugAlreadyExistsException;
 import com.blackint.mapper.ProjectMapper;
 import com.blackint.repository.ProjectRepository;
 import com.blackint.utils.IdGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,6 @@ public class ProjectService {
         Project project = projectRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
-        // Slug validation only if changed
         if (!project.getSlug().equals(request.getSlug())
                 && projectRepository.existsBySlug(request.getSlug())) {
             throw new SlugAlreadyExistsException("Slug already exists");
@@ -61,6 +61,15 @@ public class ProjectService {
         project.setShortDescription(request.getShortDescription());
         project.setFullContent(request.getFullContent());
         project.setFeaturedImage(request.getFeaturedImage());
+        try {
+            project.setGalleryImages(
+                    request.getGalleryImages() != null
+                            ? new ObjectMapper().writeValueAsString(request.getGalleryImages())
+                            : null
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Gallery conversion error");
+        }
         project.setClientName(request.getClientName());
         project.setProjectUrl(request.getProjectUrl());
         project.setIsFeatured(request.getIsFeatured());

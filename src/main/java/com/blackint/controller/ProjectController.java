@@ -71,7 +71,7 @@ public class ProjectController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/analytics")
+    @GetMapping("/getAnalytics")
     public ApiResponse<LeadAnalyticsResponse> analytics() {
 
         return ApiResponse.success(contactService.getAnalytics());
@@ -79,13 +79,13 @@ public class ProjectController {
 
     // ================= PUBLIC ROUTES ======================
 
-    @GetMapping("/published")
+    @GetMapping("/getPublished")
     public ApiResponse<List<ProjectResponse>> getPublished() {
 
         return ApiResponse.success(projectService.getPublished());
     }
 
-    @GetMapping("/slug/{slug}")
+    @GetMapping("/getBySlug/{slug}")
     public ApiResponse<ProjectResponse> getBySlug(
             @PathVariable String slug) {
 
