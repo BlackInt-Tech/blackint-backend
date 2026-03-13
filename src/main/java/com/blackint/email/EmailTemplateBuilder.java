@@ -1,6 +1,7 @@
 package com.blackint.email;
 
 import com.blackint.entity.Contact;
+import com.blackint.email.EmailLog;
 
 public class EmailTemplateBuilder {
 
@@ -547,5 +548,23 @@ public static String buildConvertedTemplate(Contact contact) {
                 .build();
 
         return buildUserConfirmationTemplate(contact);
+    }
+
+    public static String buildAdminNotificationTemplateFromLog(EmailLog log) {
+
+        Contact contact = Contact.builder()
+                .firstName(log.getFirstName())
+                .lastName(log.getLastName())
+                .email(log.getRecipient())
+                .phone(log.getPhone())
+                .company(log.getCompany())
+                .services(log.getServices())
+                .budget(log.getBudget())
+                .projectIdea(log.getProjectIdea())
+                .message(log.getMessage())
+                .publicId(log.getPublicId())
+                .build();
+
+        return buildAdminNotificationTemplate(contact);
     }
 }

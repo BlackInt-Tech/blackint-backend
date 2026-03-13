@@ -26,10 +26,13 @@ public class EmailRetryService {
 
     @Value("${blackint.from.email}")
     private String fromEmail;
+
+    @Value("${blackint.admin.email}")
+    private String adminEmail;
     
     private static final int MAX_RETRY = 3;
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 120000)
     public void retryFailedEmails() {
 
         List<EmailLog> failedEmails =
@@ -63,8 +66,15 @@ public class EmailRetryService {
 
                 Email from = new Email(fromEmail);
                 Email to = new Email(logEntry.getRecipient());
-                Content content = new Content("text/html",
-                        "Retrying previously failed email.");
+                String htmlContent;
+
+                if (logEntry.getRecipient().equals(adminEmail)) {
+                    htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplateFromLog(logEntry);
+                } else {
+                    htmlContent = EmailTemplateBuilder.buildUserConfirmationTemplateFromLog(logEntry);
+                }
+
+                Content content = new Content("text/html", htmlContent);
 
                 Mail mail = new Mail(from, logEntry.getSubject(), to, content);
 
