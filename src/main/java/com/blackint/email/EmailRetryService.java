@@ -64,7 +64,7 @@ public class EmailRetryService {
                     continue;
                 }
 
-                Email from = new Email(fromEmail);
+                Email from = new Email(fromEmail, "BlackInt");
                 Email to = new Email(logEntry.getRecipient());
                 String htmlContent;
 
