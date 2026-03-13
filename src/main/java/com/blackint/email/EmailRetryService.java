@@ -7,6 +7,8 @@ import com.sendgrid.helpers.mail.objects.Email;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,9 @@ public class EmailRetryService {
     private final EmailLogRepository emailLogRepository;
     private final SendGrid sendGrid;
 
+    @Value("${blackint.from.email}")
+    private String fromEmail;
+    
     private static final int MAX_RETRY = 3;
 
     @Scheduled(fixedRate = 300000)
@@ -56,7 +61,7 @@ public class EmailRetryService {
                     continue;
                 }
 
-                Email from = new Email("no-reply@yourdomain.com");
+                Email from = new Email(fromEmail);
                 Email to = new Email(logEntry.getRecipient());
                 Content content = new Content("text/html",
                         "Retrying previously failed email.");
