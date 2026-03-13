@@ -2,17 +2,12 @@ package com.blackint.email;
 
 import com.blackint.entity.Contact;
 import com.blackint.entity.LeadStatus;
-import com.sendgrid.*;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Content;
-import com.sendgrid.helpers.mail.objects.Email;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,153 +18,144 @@ import java.time.LocalDateTime;
 @Slf4j
 public class EmailServiceImpl implements EmailService {
 
-    private final SendGrid sendGrid;
     private final EmailLogRepository emailLogRepository;
-
-    @Value("${blackint.from.email}")
-    private String fromEmail;
 
     @Value("${blackint.admin.email}")
     private String adminEmail;
 
-    // ================= USER CONFIRMATION =================
+    /*
+     =========================================
+     USER CONFIRMATION EMAIL (QUEUED)
+     =========================================
+    */
 
-    @Async
     @Override
-    public void sendLeadSubmissionEmail(Contact contact) {
-
-        String subject = "We've received your message – BlackInt";
-        String htmlContent = EmailTemplateBuilder.buildUserConfirmationTemplate(contact);
-
-        sendEmail(contact, subject, contact.getEmail(), htmlContent);
-    }
-
-    // ================= ADMIN NOTIFICATION =================
-
-    @Async
-    @Override
-    public void sendAdminNotification(Contact contact) {
-
-        String subject = "New Lead – "
-                + contact.getFirstName() + " "
-                + contact.getLastName()
-                + " | "
-                + contact.getServices();
-        String htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplate(contact);
-
-        sendEmail(contact, subject, adminEmail, htmlContent);
-    }
-
-    // ================= STATUS UPDATE =================
-
-    @Async
-    @Override
-    public void sendLeadStatusUpdateEmail(Contact contact) {
-
-        if (contact.getStatus() != LeadStatus.CONVERTED) {
-            return;
-        }
-
-        String subject = "Welcome Aboard – BlackInt 🚀";
-        String htmlContent = EmailTemplateBuilder.buildConvertedTemplate(contact);
-
-        sendEmail(contact, subject, contact.getEmail(), htmlContent);
-    }
-
-    // ================= CORE SEND METHOD =================
-
-    private void sendEmail(Contact contact,
-                           String subject,
-                           String recipient,
-                           String htmlContent) {
-
-        if (recipient == null || recipient.isBlank()) {
-            log.error("Recipient email is null or empty | publicId={}", contact.getPublicId());
-            return;
-        }
+    public void queueLeadSubmissionEmail(Contact contact) {
 
         try {
 
-            Email from = new Email(fromEmail);
-            Email to = new Email(recipient);
-            Content content = new Content("text/html", htmlContent);
+            EmailLog logEntry = EmailLog.builder()
+                    .publicId(contact.getPublicId())
+                    .recipient(contact.getEmail())
+                    .subject("We've received your message – BlackInt")
+                    .status(EmailStatus.PENDING)
+                    .createdAt(LocalDateTime.now())
+                    .retryCount(0)
 
-            Mail mail = new Mail(from, subject, to, content);
+                    .firstName(contact.getFirstName())
+                    .lastName(contact.getLastName())
+                    .company(contact.getCompany())
+                    .phone(contact.getPhone())
+                    .services(contact.getServices())
+                    .budget(contact.getBudget())
+                    .projectIdea(contact.getProjectIdea())
+                    .message(contact.getMessage())
 
-            Request request = new Request();
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
+                    .build();
 
-            Response response = sendGrid.api(request);
+            emailLogRepository.save(logEntry);
 
-            log.info("SendGrid Response Code: {}", response.getStatusCode());
-            log.info("SendGrid Response Body: {}", response.getBody());
-
-            if (response.getStatusCode() == 202) {
-
-                emailLogRepository.save(
-                        EmailLog.builder()
-                                .publicId(contact.getPublicId())
-                                .recipient(recipient)
-                                .subject(subject)
-                                .status(EmailStatus.SUCCESS)
-                                .createdAt(LocalDateTime.now())
-                                .firstName(contact.getFirstName())
-                                .lastName(contact.getLastName())
-                                .company(contact.getCompany())
-                                .phone(contact.getPhone())
-                                .services(contact.getServices())
-                                .budget(contact.getBudget())
-                                .projectIdea(contact.getProjectIdea())
-                                .message(contact.getMessage())
-                                .build()
-                );
-
-                log.info("Email sent successfully | publicId={} | recipient={}",
-                        contact.getPublicId(), recipient);
-
-            } else {
-
-                saveFailure(contact, recipient, subject,
-                        "SendGrid response: " + response.getBody());
-            }
+            log.info("User confirmation email queued | publicId={}", contact.getPublicId());
 
         } catch (Exception ex) {
 
-            saveFailure(contact, recipient, subject, ex.getMessage());
+            log.error("Failed to queue user email | publicId={}", contact.getPublicId(), ex);
+
         }
     }
 
-    // ================= FAILURE HANDLER =================
+    /*
+     =========================================
+     ADMIN NOTIFICATION EMAIL (QUEUED)
+     =========================================
+    */
 
-    private void saveFailure(Contact contact,
-                             String recipient,
-                             String subject,
-                             String errorMessage) {
+    @Override
+    public void queueAdminNotification(Contact contact) {
 
-        emailLogRepository.save(
-                EmailLog.builder()
-                        .publicId(contact.getPublicId())
-                        .recipient(recipient)
-                        .subject(subject)
-                        .status(EmailStatus.FAILED)
-                        .errorMessage(errorMessage)
-                        .retryCount(0)
-                        .nextRetryAt(LocalDateTime.now().plusMinutes(5))
-                        .createdAt(LocalDateTime.now())
-                        .firstName(contact.getFirstName())
-                        .lastName(contact.getLastName())
-                        .company(contact.getCompany())
-                        .phone(contact.getPhone())
-                        .services(contact.getServices())
-                        .budget(contact.getBudget())
-                        .projectIdea(contact.getProjectIdea())
-                        .message(contact.getMessage())
-                        .build()
-        );
+        try {
 
-        log.error("Email failed | publicId={} | recipient={} | error={}",
-                contact.getPublicId(), recipient, errorMessage);
+            String subject =
+                    "New Lead – "
+                            + contact.getFirstName()
+                            + " "
+                            + contact.getLastName()
+                            + " | "
+                            + contact.getServices();
+
+            EmailLog logEntry = EmailLog.builder()
+                    .publicId(contact.getPublicId())
+                    .recipient(adminEmail)
+                    .subject(subject)
+                    .status(EmailStatus.PENDING)
+                    .createdAt(LocalDateTime.now())
+                    .retryCount(0)
+
+                    .firstName(contact.getFirstName())
+                    .lastName(contact.getLastName())
+                    .company(contact.getCompany())
+                    .phone(contact.getPhone())
+                    .services(contact.getServices())
+                    .budget(contact.getBudget())
+                    .projectIdea(contact.getProjectIdea())
+                    .message(contact.getMessage())
+
+                    .build();
+
+            emailLogRepository.save(logEntry);
+
+            log.info("Admin notification email queued | publicId={}", contact.getPublicId());
+
+        } catch (Exception ex) {
+
+            log.error("Failed to queue admin email | publicId={}", contact.getPublicId(), ex);
+
+        }
     }
+
+    /*
+     =========================================
+     CONVERTED CLIENT EMAIL (QUEUED)
+     =========================================
+    */
+
+    @Override
+    public void queueConvertedEmail(Contact contact) {
+
+        try {
+
+            if (contact.getStatus() != LeadStatus.CONVERTED) {
+                return;
+            }
+
+            EmailLog logEntry = EmailLog.builder()
+                    .publicId(contact.getPublicId())
+                    .recipient(contact.getEmail())
+                    .subject("Welcome Aboard – BlackInt 🚀")
+                    .status(EmailStatus.PENDING)
+                    .createdAt(LocalDateTime.now())
+                    .retryCount(0)
+
+                    .firstName(contact.getFirstName())
+                    .lastName(contact.getLastName())
+                    .company(contact.getCompany())
+                    .phone(contact.getPhone())
+                    .services(contact.getServices())
+                    .budget(contact.getBudget())
+                    .projectIdea(contact.getProjectIdea())
+                    .message(contact.getMessage())
+
+                    .build();
+
+            emailLogRepository.save(logEntry);
+
+            log.info("Converted client email queued | publicId={}", contact.getPublicId());
+
+        } catch (Exception ex) {
+
+            log.error("Failed to queue converted email | publicId={}", contact.getPublicId(), ex);
+
+        }
+    }
+
 }

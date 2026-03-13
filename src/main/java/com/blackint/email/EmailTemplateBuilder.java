@@ -530,4 +530,22 @@ public static String buildConvertedTemplate(Contact contact) {
             
     );
     }
+
+    public static String buildUserConfirmationTemplateFromLog(EmailLog log) {
+
+        Contact contact = Contact.builder()
+                .publicId(log.getPublicId())
+                .firstName(log.getFirstName())
+                .lastName(log.getLastName())
+                .email(log.getRecipient())
+                .phone(log.getPhone())
+                .company(log.getCompany())
+                .services(log.getServices())
+                .budget(log.getBudget())
+                .projectIdea(log.getProjectIdea())
+                .message(log.getMessage())
+                .build();
+
+        return buildUserConfirmationTemplate(contact);
+    }
 }

@@ -33,8 +33,8 @@ public class ContactService {
 
         repository.save(contact);
 
-        emailService.sendLeadSubmissionEmail(contact);
-        emailService.sendAdminNotification(contact);
+        emailService.queueLeadSubmissionEmail(contact);
+        emailService.queueAdminNotification(contact);
     }
 
     public Page<ContactResponse> getAll(
@@ -71,7 +71,7 @@ public class ContactService {
         contact.setUpdatedAt(LocalDateTime.now());
 
         repository.save(contact);
-        emailService.sendLeadStatusUpdateEmail(contact);
+        emailService.queueConvertedEmail(contact);
     }
 
     public void delete(String publicId) {

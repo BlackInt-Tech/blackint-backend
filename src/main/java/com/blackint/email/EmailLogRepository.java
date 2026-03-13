@@ -11,5 +11,7 @@ public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
             EmailStatus status,
             LocalDateTime time
     );
+
+    List<EmailLog> findTop10ByStatus(EmailStatus status);
     
 }
