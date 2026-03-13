@@ -42,6 +42,20 @@ public class EmailRetryService {
 
             try {
 
+                if (logEntry.getRecipient() == null || logEntry.getRecipient().isBlank()) {
+                    log.error("Invalid recipient for email log id={}", logEntry.getId());
+                    logEntry.setStatus(EmailStatus.FAILED);
+                    emailLogRepository.save(logEntry);
+                    continue;
+                }
+
+                if (logEntry.getSubject() == null || logEntry.getSubject().isBlank()) {
+                    log.error("Missing subject for email log id={}", logEntry.getId());
+                    logEntry.setStatus(EmailStatus.FAILED);
+                    emailLogRepository.save(logEntry);
+                    continue;
+                }
+
                 Email from = new Email("no-reply@yourdomain.com");
                 Email to = new Email(logEntry.getRecipient());
                 Content content = new Content("text/html",
