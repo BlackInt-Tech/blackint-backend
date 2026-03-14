@@ -2,7 +2,7 @@ package com.blackint.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -39,6 +39,7 @@ public class Contact {
     private String budget;
 
     @Column(columnDefinition = "TEXT")
+    @Size(min = 20, message = "Project idea must contain at least 20 characters")
     private String projectIdea;
 
     @Column(columnDefinition = "TEXT")
