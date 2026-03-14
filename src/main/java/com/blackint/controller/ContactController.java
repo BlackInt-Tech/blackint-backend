@@ -35,7 +35,7 @@ public class ContactController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
+    @GetMapping("/getAll")
     public ApiResponse<Page<ContactResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -46,7 +46,7 @@ public class ContactController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{publicId}")
+    @PutMapping("/updateStatus/{publicId}")
     public ApiResponse<Void> updateStatus(
             @PathVariable String publicId,
             @RequestParam LeadStatus status
@@ -56,14 +56,14 @@ public class ContactController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{publicId}")
+    @DeleteMapping("/delete/{publicId}")
     public ApiResponse<Void> delete(@PathVariable String publicId) {
         service.delete(publicId);
         return ApiResponse.successMessage("Lead deleted successfully");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/analytics")
+    @GetMapping("/getAnalytics")
     public ApiResponse<LeadAnalyticsResponse> analytics() {
         return ApiResponse.success(service.getAnalytics());
     }

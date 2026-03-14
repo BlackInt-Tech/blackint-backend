@@ -17,17 +17,17 @@ public class TestEmailConfig {
         return new EmailService() {
 
             @Override
-            public void sendLeadSubmissionEmail(Contact contact) {
+            public void queueLeadSubmissionEmail(Contact contact) {
                 // No-op for tests
             }
 
             @Override
-            public void sendAdminNotification(Contact contact) {
+            public void queueAdminNotification(Contact contact) {
                 // No-op for tests
             }
 
             @Override
-            public void sendLeadStatusUpdateEmail(Contact contact) {
+            public void queueConvertedEmail(Contact contact) {
                 // No-op for tests
             }
         };

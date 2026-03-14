@@ -24,11 +24,12 @@ public interface ContactRepository extends JpaRepository<Contact, UUID> {
             Pageable pageable
     );
 
-    Page<Contact> findByIsDeletedFalseAndFullNameContainingIgnoreCaseOrIsDeletedFalseAndEmailContainingIgnoreCase(
-            String nameKeyword,
-            String emailKeyword,
-            Pageable pageable
-    );
+    Page<Contact> findByIsDeletedFalseAndFirstNameContainingIgnoreCaseOrIsDeletedFalseAndLastNameContainingIgnoreCaseOrIsDeletedFalseAndEmailContainingIgnoreCase(
+        String firstName,
+        String lastName,
+        String email,
+        Pageable pageable
+        );
 
     // ================= COUNTING =================
 

@@ -4,10 +4,10 @@ import com.blackint.entity.Contact;
 
 public interface EmailService {
 
-    void sendLeadSubmissionEmail(Contact contact);
+    void queueLeadSubmissionEmail(Contact contact);
 
-    void sendAdminNotification(Contact contact);
+    void queueAdminNotification(Contact contact);
 
-    void sendLeadStatusUpdateEmail(Contact contact);
+    void queueConvertedEmail(Contact contact);
 
 }

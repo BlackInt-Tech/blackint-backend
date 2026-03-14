@@ -7,6 +7,8 @@ import com.sendgrid.helpers.mail.objects.Email;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +24,15 @@ public class EmailRetryService {
     private final EmailLogRepository emailLogRepository;
     private final SendGrid sendGrid;
 
+    @Value("${blackint.from.email}")
+    private String fromEmail;
+
+    @Value("${blackint.admin.email}")
+    private String adminEmail;
+    
     private static final int MAX_RETRY = 3;
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 120000)
     public void retryFailedEmails() {
 
         List<EmailLog> failedEmails =
@@ -42,10 +50,31 @@ public class EmailRetryService {
 
             try {
 
-                Email from = new Email("no-reply@yourdomain.com");
+                if (logEntry.getRecipient() == null || logEntry.getRecipient().isBlank()) {
+                    log.error("Invalid recipient for email log id={}", logEntry.getId());
+                    logEntry.setStatus(EmailStatus.FAILED);
+                    emailLogRepository.save(logEntry);
+                    continue;
+                }
+
+                if (logEntry.getSubject() == null || logEntry.getSubject().isBlank()) {
+                    log.error("Missing subject for email log id={}", logEntry.getId());
+                    logEntry.setStatus(EmailStatus.FAILED);
+                    emailLogRepository.save(logEntry);
+                    continue;
+                }
+
+                Email from = new Email(fromEmail, "BlackInt");
                 Email to = new Email(logEntry.getRecipient());
-                Content content = new Content("text/html",
-                        "Retrying previously failed email.");
+                String htmlContent;
+
+                if (logEntry.getRecipient().equals(adminEmail)) {
+                    htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplateFromLog(logEntry);
+                } else {
+                    htmlContent = EmailTemplateBuilder.buildUserConfirmationTemplateFromLog(logEntry);
+                }
+
+                Content content = new Content("text/html", htmlContent);
 
                 Mail mail = new Mail(from, logEntry.getSubject(), to, content);
 

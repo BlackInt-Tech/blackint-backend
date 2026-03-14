@@ -4,67 +4,566 @@ import com.blackint.entity.Contact;
 
 public class EmailTemplateBuilder {
 
+    private static final String logo_url = "https://blackint-dev.onrender.com/images/logo.png";
+    private static final String fb_icon = "https://blackint-dev.onrender.com/images/facebook.png";
+    private static final String insta_icon = "https://blackint-dev.onrender.com/images/instagram.png";
+    private static final String linkedin_icon = "https://blackint-dev.onrender.com/images/linkedin.png";
+    private static final String twitter_icon = "https://blackint-dev.onrender.com/images/twitter.png";
+    private static final String welcome_image = "https://blackint-dev.onrender.com/images/email-welcome.jpg";
+    private static final String conversion_image = "https://blackint-dev.onrender.com/images/email-conversion.jpg";
+
+    private static String formatServices(String services) {
+
+        if (services == null || services.isBlank()) {
+            return "<div style='color:#777;'>No services selected</div>";
+        }
+
+        String[] servicesArray = services.split(",");
+
+        StringBuilder builder = new StringBuilder();
+
+        for (String service : servicesArray) {
+            builder.append("""
+                <div style="margin-bottom:6px;">
+                    • <span style="color:#FFFFFF;">%s</span>
+                </div>
+            """.formatted(service.trim()));
+        }
+
+        return builder.toString();
+    }
+    
     public static String buildUserConfirmationTemplate(Contact contact) {
 
-        return """
+        String servicesHtml = formatServices(contact.getServices());
+
+    return """
+        <!DOCTYPE html>
         <html>
-        <body style="font-family: Arial; background:#f4f4f4; padding:20px;">
-            <div style="background:white; padding:30px; border-radius:10px;">
-                <h2 style="color:#FF4D00;">Hi %s 👋</h2>
-                <p>Thank you for reaching out to <strong>BlackInt</strong>.</p>
-                <p>We've received your inquiry regarding:</p>
-                <p><strong>%s</strong></p>
-                <p>Our team will contact you within 24 hours.</p>
-                <hr/>
-                <p style="font-size:12px;color:gray;">
-                    BlackInt – Digital Growth Partner
-                </p>
-            </div>
+        <head>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <title>Welcome to BlackInt</title>
+        </head>
+
+        <body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+
+            <table width="100%%" cellpadding="0" cellspacing="0" style="padding:40px 0;background:#ffffff;">
+                <tr>
+                    <td align="center">
+
+                        <table width="620" cellpadding="0" cellspacing="0"
+                            style="background:#111111;border-radius:14px;overflow:hidden;max-width:95%%;">
+
+                            <!-- ================= HEADER ================= -->
+                            <tr>
+                                <td align="center" style="padding:40px 20px 30px 20px;">
+
+                                    <!-- Brand -->
+                                    <div style="font-size:26px;font-weight:800;letter-spacing:0.2px;">
+                                        <img src="%s" style="height:40px;vertical-align:middle;margin-right:6px;">
+                                        <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>                                      
+                                    </div>
+
+                                    <!-- Welcome -->
+                                    <h1 style="color:#FF4D00;margin:25px 0 10px 0;font-size:20px;">
+                                        Welcome %s 👋
+                                    </h1>
+
+                                    <p style="color:#CCCCCC;font-size:15px;max-width:480px;">
+                                        Thank you for reaching out to <strong style="color:#FFFFFF;">BlackInt.</strong></br>
+                                        We're excited to explore your vision.
+                                    </p>
+
+                                </td>
+                            </tr>
+
+                            <!-- ================= IMAGE ================= -->
+                            <tr>
+                                <td align="center">
+                                    <img src="%s"
+                                        width="620"
+                                        style="width:100%%;max-width:620px;display:block;"
+                                        alt="BlackInt Welcome"/>
+                                </td>
+                            </tr>
+
+                            <!-- ================= DETAILS ================= -->
+                            <tr>
+                                <td style="padding:35px 40px;color:#CCCCCC;font-size:15px;line-height:1.7;">
+
+                                    <p>We’ve received your inquiry regarding:</p>
+                                    <p><strong style="color:#FFFFFF;">Services :</strong></p>
+                                    <div style="background:#1A1A1A;
+                                                padding:18px;
+                                                border-left:4px solid #FF4D00;
+                                                border-radius:6px;
+                                                margin:20px 0;
+                                                color:#FFFFFF;">
+                                        %s
+                                    </div>
+
+                                    <p>
+                                        Our strategy team is reviewing your request. You can expect callback within
+                                        <strong style="color:#FFFFFF;">24 hours</strong>.
+                                    </p>
+
+                                </td>
+                            </tr>
+
+                            <!-- ================= CTA BUTTONS ================= -->
+                            <tr>
+                                <td align="center" style="padding:10px 20px 40px 20px;">
+
+                                    <table cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td align="center" style="padding:8px;">
+                                                <a href="https://blackint.tech"
+                                                style="background:#FF4D00;
+                                                        color:#FFFFFF;
+                                                        text-decoration:none;
+                                                        padding:12px 24px;
+                                                        border-radius:6px;
+                                                        font-size:14px;
+                                                        display:inline-block;">
+                                                    Visit Website
+                                                </a>
+                                            </td>
+
+                                            <td align="center" style="padding:8px;">
+                                                <a href="https://blackint.tech/insights"
+                                                style="border:1px solid #FF4D00;
+                                                        color:#FF4D00;
+                                                        text-decoration:none;
+                                                        padding:12px 24px;
+                                                        border-radius:6px;
+                                                        font-size:14px;
+                                                        display:inline-block;">
+                                                    Read Our Insights
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                </td>
+                            </tr>
+
+                            <!-- ================= SIGN OFF ================= -->
+                            <tr>
+                                <td style="padding:30px 40px;color:#CCCCCC;font-size:14px;line-height:1.6;">
+
+                                    <p style="margin:0 0 10px 0;">
+                                        Best Regards,
+                                    </p>
+
+                                    <p style="margin:0;color:#FFFFFF;font-weight:bold;">
+                                        BlackInt Strategy Team
+                                    </p>
+
+                                </td>
+                            </tr>
+
+                            <!-- ================= FOOTER ================= -->
+                            <tr>
+                                <td style="background:#0E0E0E;padding:30px 20px;text-align:center;font-size:12px;color:#777777;">
+
+                                    <p style="margin:5px 0;">
+                                        BlackInt – Digital Growth Partner
+                                    </p>
+
+                                    <p style="margin:5px 0;">
+                                        Greater Noida, Uttar Pradesh, India
+                                    </p>
+
+                                    <p style="margin:8px 0;">
+                                        <a href="https://blackint.tech/privacy"
+                                        style="color:#777777;text-decoration:none;margin:0 8px;">
+                                            Privacy Policy
+                                        </a> |
+                                        <a href="https://blackint.tech/terms"
+                                        style="color:#777777;text-decoration:none;margin:0 8px;">
+                                            Terms of Service
+                                        </a>
+                                    </p>
+
+                                    <!-- Social Links -->
+                                    <div style="margin-top:15px;">
+                                        <a href="https://instagram.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" height="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://linkedin.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" height="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://facebook.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" height="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://twitter.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" height="18" style="opacity:0.8;"/>
+                                        </a>
+                                    </div>
+
+                                    <p style="margin-top:15px;">
+                                        © 2026 BlackInt. All rights reserved.
+                                    </p>
+
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+            </table>
+
         </body>
         </html>
-        """.formatted(contact.getFullName(), contact.getSubject());
-    }
+    """.formatted(
+            logo_url,
+            contact.getFirstName() + " " + contact.getLastName(),
+            welcome_image,
+            servicesHtml,
+            insta_icon,
+            linkedin_icon,
+            fb_icon,
+            twitter_icon
+    );
+}
+
 
     public static String buildAdminNotificationTemplate(Contact contact) {
 
-        return """
+        String servicesHtml = formatServices(contact.getServices());
+
+    return """
+        <!DOCTYPE html>
         <html>
-        <body style="font-family: Arial;">
-            <h3>New Lead Received 🚀</h3>
-            <p><strong>Name:</strong> %s</p>
-            <p><strong>Email:</strong> %s</p>
-            <p><strong>Phone:</strong> %s</p>
-            <p><strong>Subject:</strong> %s</p>
-            <p><strong>Message:</strong></p>
-            <p>%s</p>
-            <hr/>
-            <p>Public ID: %s</p>
+        <head>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <title>New Lead - BlackInt</title>
+        </head>
+
+        <body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+
+            <table width="100%%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+                <tr>
+                    <td align="center">
+
+                        <table width="620" cellpadding="0" cellspacing="0"
+                            style="background:#111111;border-radius:14px;overflow:hidden;max-width:95%%;">
+
+                            <!-- HEADER -->
+                            <tr>
+                                <td align="center" style="padding:30px;">
+                                    <div style="font-size:26px;font-weight:800;letter-spacing:0.2px;">
+                                        <img src="%s" style="height:40px;vertical-align:middle;margin-right:6px;">
+                                        <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>                                      
+                                    </div>
+                                    <h2 style="color:#FF4D00;margin-top:20px;">
+                                        New Lead Received
+                                    </h2>
+                                </td>
+                            </tr>
+
+                            <!-- LEAD DETAILS -->
+                            <tr>
+                                <td style="padding:30px 40px;color:#CCCCCC;font-size:14px;line-height:1.7;">
+
+                                    <div style="background:#1A1A1A;padding:20px;border-radius:8px;margin-bottom:20px;">
+
+                                        <p><strong style="color:#FFFFFF;">Name:</strong> %s</p>
+                                        <p><strong style="color:#FFFFFF;">Email:</strong> %s</p>
+                                        <p><strong style="color:#FFFFFF;">Phone:</strong> %s</p>
+                                        <p><strong style="color:#FFFFFF;">Services :</strong></p>
+                                        <div style="background:#1A1A1A;
+                                                    padding:18px;
+                                                    border-left:4px solid #FF4D00;
+                                                    border-radius:6px;">
+                                            %s
+                                        </div>
+                                        <p style="margin-top:20px;"><strong style="color:#FFFFFF;">Project Desc. :</strong>%s</p>
+
+                                    </div>
+
+                                    <p style="margin-top:25px;font-size:12px;color:#777;">
+                                        Public ID: %s
+                                    </p>
+
+                                </td>
+                            </tr>
+
+                            <!-- FOOTER -->
+                            <tr>
+                                <td style="background:#0E0E0E;padding:20px;text-align:center;font-size:12px;color:#777;">
+                                    BlackInt Admin Notification System
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+            </table>
+
         </body>
         </html>
         """.formatted(
-                contact.getFullName(),
+                logo_url,
+                contact.getFirstName() + " " + contact.getLastName(),
                 contact.getEmail(),
                 contact.getPhone(),
-                contact.getSubject(),
-                contact.getMessage(),
+                servicesHtml,
+                contact.getProjectIdea(),
                 contact.getPublicId()
         );
     }
 
-    public static String buildConvertedTemplate(Contact contact) {
 
-        return """
-        <html>
-        <body style="font-family: Arial; background:#f4f4f4; padding:20px;">
-            <div style="background:white; padding:30px; border-radius:10px;">
-                <h2 style="color:#FF4D00;">Welcome Aboard %s 🎉</h2>
-                <p>We're excited to start working with you!</p>
-                <p>Our strategy team will connect shortly.</p>
-                <hr/>
-                <p>BlackInt Team 🚀</p>
-            </div>
-        </body>
-        </html>
-        """.formatted(contact.getFullName());
+public static String buildConvertedTemplate(Contact contact) {
+
+    String servicesHtml = formatServices(contact.getServices());
+
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Welcome to BlackInt</title>
+    </head>
+
+    <body style="margin:0;padding:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;">
+
+        <table width="100%%" cellpadding="0" cellspacing="0" style="padding:40px 0;background:#ffffff;">
+            <tr>
+                <td align="center">
+
+                    <table width="620" cellpadding="0" cellspacing="0"
+                           style="background:#111111;border-radius:14px;overflow:hidden;max-width:95%%;">
+
+                        <!-- ================= HEADER ================= -->
+                        <tr>
+                            <td align="center" style="padding:40px 20px 30px 20px;">
+
+                                <!-- Brand -->
+                                <div style="font-size:26px;font-weight:800;letter-spacing:0.2px;">
+                                    <img src="%s" style="height:40px;vertical-align:middle;margin-right:6px;">
+                                    <span style="color:#FFFFFF;">Black</span><span style="color:#FF4D00;">Int</span>
+                                </div>
+
+                                <!-- Welcome -->
+                                <h1 style="color:#FF4D00;margin:25px 0 10px 0;font-size:26px;">
+                                    Welcome Aboard %s 🎉
+                                </h1>
+
+                                <p style="color:#CCCCCC;font-size:15px;max-width:480px;line-height:1.6;margin:0 auto;">
+                                    We're excited to officially begin working with you.<br>
+                                    Our team is ready to turn your ideas into impactful digital solutions.
+                                </p>
+
+                            </td>
+                        </tr>
+
+                        <!-- ================= HERO IMAGE ================= -->
+                        <tr>
+                            <td align="center">
+                                <img src="%s"
+                                     width="620"
+                                     style="width:100%%;max-width:620px;display:block;"
+                                     alt="BlackInt Welcome"/>
+                            </td>
+                        </tr>
+
+                        <!-- ================= CONTENT ================= -->
+                        <tr>
+                            <td style="padding:35px 40px;color:#CCCCCC;font-size:15px;line-height:1.7;">
+
+                                <p>
+                                    Our strategy team will reach out shortly to begin onboarding
+                                    and align on next steps for your project.
+
+                                    <p><strong style="color:#FFFFFF;">Services : </strong></p>
+                                    <div style="background:#1A1A1A;
+                                                padding:18px;
+                                                border-left:4px solid #FF4D00;
+                                                border-radius:6px;
+                                                margin:20px 0;
+                                                color:#FFFFFF;">
+                                        %s
+                                    </div>
+                                </p>
+                                <p>
+                                    You’ll receive further updates soon.
+                                </p>
+
+                            </td>
+                        </tr>
+
+                        <!-- ================= CTA BUTTONS ================= -->
+                        <tr>
+                            <td align="center" style="padding:10px 20px 40px 20px;">
+
+                                <table cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td align="center" style="padding:8px;">
+                                            <a href="https://blackint.tech"
+                                               style="background:#FF4D00;
+                                                      color:#FFFFFF;
+                                                      text-decoration:none;
+                                                      padding:12px 24px;
+                                                      border-radius:6px;
+                                                      font-size:14px;
+                                                      display:inline-block;">
+                                                Visit Website
+                                            </a>
+                                        </td>
+
+                                        <td align="center" style="padding:8px;">
+                                            <a href="https://blackint.tech/insights"
+                                               style="border:1px solid #FF4D00;
+                                                      color:#FF4D00;
+                                                      text-decoration:none;
+                                                      padding:12px 24px;
+                                                      border-radius:6px;
+                                                      font-size:14px;
+                                                      display:inline-block;">
+                                                Explore Insights
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+
+                        <p>
+                            We’re committed to delivering measurable growth and premium digital experiences.
+                        </p>
+
+                        <!-- ================= SIGN OFF ================= -->
+                        <tr>
+                            <td style="padding:30px 40px;color:#CCCCCC;font-size:14px;line-height:1.6;">
+
+                                <p style="margin:0 0 10px 0;">
+                                    Best Regards,
+                                </p>
+
+                                <p style="margin:0;color:#FFFFFF;font-weight:bold;">
+                                    BlackInt Strategy Team
+                                </p>
+
+                            </td>
+                        </tr>
+
+                        <!-- ================= FOOTER ================= -->
+                        <tr>
+                            <td style="background:#0E0E0E;padding:30px 20px;text-align:center;font-size:12px;color:#777777;">
+
+                                <p style="margin:5px 0;">
+                                    BlackInt – Digital Growth Partner
+                                </p>
+
+                                <p style="margin:5px 0;">
+                                    Greater Noida, Uttar Pradesh, India
+                                </p>
+
+                                <!-- Social Links -->
+                                    <div style="margin-top:15px;">
+                                        <a href="https://instagram.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" height="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://linkedin.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" height="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://facebook.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" height="18" style="opacity:0.8;"/>
+                                        </a>
+                                        <a href="https://twitter.com" style="margin:0 6px;">
+                                            <img src="%s"
+                                                width="18" height="18" style="opacity:0.8;"/>
+                                        </a>
+                                    </div>
+
+
+                                <p style="margin:8px 0;">
+                                    <a href="https://blackint.tech/privacy"
+                                       style="color:#777777;text-decoration:none;margin:0 8px;">
+                                        Privacy Policy
+                                    </a> |
+                                    <a href="https://blackint.tech/terms"
+                                       style="color:#777777;text-decoration:none;margin:0 8px;">
+                                        Terms of Service
+                                    </a>
+                                </p>
+
+                                <p style="margin-top:15px;">
+                                    © 2026 BlackInt. All rights reserved.
+                                </p>
+
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+
+    </body>
+    </html>
+    """.formatted(
+            logo_url,
+            contact.getFirstName() + " " + contact.getLastName(),
+            conversion_image,
+            servicesHtml,
+            insta_icon,
+            linkedin_icon,
+            fb_icon,
+            twitter_icon
+            
+    );
+    }
+
+    public static String buildUserConfirmationTemplateFromLog(EmailLog log) {
+
+        Contact contact = Contact.builder()
+                .publicId(log.getPublicId())
+                .firstName(log.getFirstName())
+                .lastName(log.getLastName())
+                .email(log.getRecipient())
+                .phone(log.getPhone())
+                .company(log.getCompany())
+                .services(log.getServices())
+                .budget(log.getBudget())
+                .projectIdea(log.getProjectIdea())
+                .message(log.getMessage())
+                .build();
+
+        return buildUserConfirmationTemplate(contact);
+    }
+
+    public static String buildAdminNotificationTemplateFromLog(EmailLog log) {
+
+        Contact contact = Contact.builder()
+                .firstName(log.getFirstName())
+                .lastName(log.getLastName())
+                .email(log.getRecipient())
+                .phone(log.getPhone())
+                .company(log.getCompany())
+                .services(log.getServices())
+                .budget(log.getBudget())
+                .projectIdea(log.getProjectIdea())
+                .message(log.getMessage())
+                .publicId(log.getPublicId())
+                .build();
+
+        return buildAdminNotificationTemplate(contact);
     }
 }

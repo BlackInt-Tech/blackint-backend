@@ -1,5 +1,7 @@
 package com.blackint.dto.request;
 
+import java.util.List;
+
 import lombok.*;
 
 @Getter
@@ -16,6 +18,7 @@ public class ProjectRequest {
     private String featuredImage;
     private String clientName;
     private String projectUrl;
+    private List<String> galleryImages;
     private Boolean isFeatured;
     private String seoTitle;
     private String seoDescription;
