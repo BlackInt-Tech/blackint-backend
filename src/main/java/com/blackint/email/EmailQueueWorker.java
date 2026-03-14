@@ -1,10 +1,5 @@
 package com.blackint.email;
 
-import com.blackint.email.EmailLog;
-import com.blackint.email.EmailLogRepository;
-import com.blackint.email.EmailStatus;
-import com.blackint.email.EmailTemplateBuilder;
-
 import com.sendgrid.SendGrid;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -48,7 +43,7 @@ public class EmailQueueWorker {
                 logEntry.setStatus(EmailStatus.PROCESSING);
                 emailLogRepository.save(logEntry);
 
-                Email from = new Email(fromEmail);
+                Email from = new Email(fromEmail, "BlackInt");
                 Email to = new Email(logEntry.getRecipient());
 
                 Content content = new Content(

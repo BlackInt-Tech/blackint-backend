@@ -1,7 +1,6 @@
 package com.blackint.email;
 
 import com.blackint.entity.Contact;
-import com.blackint.email.EmailLog;
 
 public class EmailTemplateBuilder {
 
