@@ -10,7 +10,7 @@ public class EmailTemplateBuilder {
     private static final String linkedin_icon = "https://blackint-dev.onrender.com/images/linkedin.png";
     private static final String twitter_icon = "https://blackint-dev.onrender.com/images/twitter.png";
     private static final String welcome_image = "https://blackint-dev.onrender.com/images/email-welcome.jpg";
-    private static final String hero_image = "https://blackint-dev.onrender.com/images/hero-image.png";
+    private static final String conversion_image = "https://blackint-dev.onrender.com/images/email-conversion.jpg";
 
     private static String formatServices(String services) {
 
@@ -521,7 +521,7 @@ public static String buildConvertedTemplate(Contact contact) {
     """.formatted(
             logo_url,
             contact.getFirstName() + " " + contact.getLastName(),
-            hero_image,
+            conversion_image,
             servicesHtml,
             insta_icon,
             linkedin_icon,
