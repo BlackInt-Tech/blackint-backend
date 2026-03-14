@@ -1,17 +1,20 @@
 package com.blackint.controller;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
 
 @RestController
+@RequestMapping("/health")
 public class HealthController {
 
-    @GetMapping("/")
-    public String home() {
-        return "BlackInt Backend Running 🚀";
-    }
+    @GetMapping
+    public Map<String, String> health() {
 
-    @GetMapping("/health")
-    public String health() {
-        return "OK";
+        return Map.of(
+                "status", "UP",
+                "service", "BlackInt Backend"
+        );
     }
 }

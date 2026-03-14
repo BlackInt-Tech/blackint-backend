@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,7 +17,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.Claims;
+
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -32,38 +36,56 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // Skip authentication for public endpoints
+        if (path.startsWith("/api/auth")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
 
-        // If no header OR not Bearer → just continue
+        // No token → continue
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = authHeader.substring(7);
-        String email = null;
+        String email;
 
         try {
             email = jwtService.extractEmail(token);
         } catch (Exception e) {
-            // Never break request for invalid token
-            log.warn("Invalid or malformed JWT: {}", e.getMessage());
+            log.warn("Invalid JWT token: {}", e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Authenticate only if valid and not already authenticated
+        // Authenticate if not already authenticated
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (jwtService.isTokenValid(token, userDetails)) {
 
+                Claims claims = jwtService.extractAllClaims(token);
+
+                String role = claims.get("role", String.class);
+                String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+
+                SimpleGrantedAuthority authority =
+                        new SimpleGrantedAuthority(authorityRole);
+
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-                                userDetails.getAuthorities()
+                                List.of(authority)
                         );
 
                 authToken.setDetails(
@@ -71,6 +93,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                log.info("Authenticated user: {}", email);
             }
         }
 
