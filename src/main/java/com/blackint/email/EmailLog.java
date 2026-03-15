@@ -53,4 +53,8 @@ public class EmailLog {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EmailType emailType;
+    
 }

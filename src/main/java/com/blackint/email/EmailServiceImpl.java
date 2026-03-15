@@ -35,6 +35,7 @@ public class EmailServiceImpl implements EmailService {
         try {
 
             EmailLog logEntry = EmailLog.builder()
+                    .emailType(EmailType.USER_CONFIRMATION)
                     .publicId(contact.getPublicId())
                     .recipient(contact.getEmail())
                     .subject("We've received your message – BlackInt")
@@ -84,6 +85,7 @@ public class EmailServiceImpl implements EmailService {
                             + contact.getServices();
 
             EmailLog logEntry = EmailLog.builder()
+                    .emailType(EmailType.ADMIN_NOTIFICATION)
                     .publicId(contact.getPublicId())
                     .recipient(adminEmail)
                     .subject(subject)
@@ -129,6 +131,7 @@ public class EmailServiceImpl implements EmailService {
             }
 
             EmailLog logEntry = EmailLog.builder()
+                    .emailType(EmailType.CONVERTED_CLIENT)
                     .publicId(contact.getPublicId())
                     .recipient(contact.getEmail())
                     .subject("Welcome Aboard – BlackInt 🚀")

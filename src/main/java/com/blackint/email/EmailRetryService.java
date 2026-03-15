@@ -24,6 +24,8 @@ public class EmailRetryService {
     private final EmailLogRepository emailLogRepository;
     private final SendGrid sendGrid;
 
+    private final EmailTemplateBuilder emailTemplateBuilder;
+
     @Value("${blackint.from.email}")
     private String fromEmail;
 
@@ -36,12 +38,15 @@ public class EmailRetryService {
     public void retryFailedEmails() {
 
         List<EmailLog> failedEmails =
-                emailLogRepository.findByStatusAndNextRetryAtBefore(
-                        EmailStatus.FAILED,
+                emailLogRepository.findByStatusInAndNextRetryAtBefore(
+                        List.of(EmailStatus.FAILED),
                         LocalDateTime.now()
                 );
 
         for (EmailLog logEntry : failedEmails) {
+
+            logEntry.setStatus(EmailStatus.PROCESSING);
+            emailLogRepository.save(logEntry);
 
             if (logEntry.getRetryCount() >= MAX_RETRY) {
                 log.warn("Max retry reached for email id={}", logEntry.getId());
@@ -68,10 +73,22 @@ public class EmailRetryService {
                 Email to = new Email(logEntry.getRecipient());
                 String htmlContent;
 
-                if (logEntry.getRecipient().equals(adminEmail)) {
-                    htmlContent = EmailTemplateBuilder.buildAdminNotificationTemplateFromLog(logEntry);
-                } else {
-                    htmlContent = EmailTemplateBuilder.buildUserConfirmationTemplateFromLog(logEntry);
+                switch (logEntry.getEmailType()) {
+
+                    case ADMIN_NOTIFICATION ->
+                            htmlContent = emailTemplateBuilder
+                                    .buildAdminNotificationTemplateFromLog(logEntry);
+
+                    case USER_CONFIRMATION ->
+                            htmlContent = emailTemplateBuilder
+                                    .buildUserConfirmationTemplateFromLog(logEntry);
+
+                    case CONVERTED_CLIENT ->
+                            htmlContent = emailTemplateBuilder
+                                    .buildConvertedTemplateFromLog(logEntry);
+
+                    default ->
+                            throw new IllegalStateException("Unknown email type");
                 }
 
                 Content content = new Content("text/html", htmlContent);
