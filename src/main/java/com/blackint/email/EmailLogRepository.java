@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmailLogRepository extends JpaRepository<EmailLog, Long> {
 
-    List<EmailLog> findByStatusAndNextRetryAtBefore(
-            EmailStatus status,
+    List<EmailLog> findByStatusInAndNextRetryAtBefore(
+            List<EmailStatus> statuses,
             LocalDateTime time
     );
 

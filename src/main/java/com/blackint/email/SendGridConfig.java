@@ -13,7 +13,6 @@ public class SendGridConfig {
 
     @Bean
     public SendGrid sendGrid() {
-        System.out.println("Loaded sendGrid Key: " + apiKey);
         return new SendGrid(apiKey);
     }
 }

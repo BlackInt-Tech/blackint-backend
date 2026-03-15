@@ -27,6 +27,8 @@ public class EmailQueueWorker {
     private final EmailLogRepository emailLogRepository;
     private final SendGrid sendGrid;
 
+    private final EmailTemplateBuilder emailTemplateBuilder;
+
     @Value("${blackint.from.email}")
     private String fromEmail;
 
@@ -46,9 +48,27 @@ public class EmailQueueWorker {
                 Email from = new Email(fromEmail, "BlackInt");
                 Email to = new Email(logEntry.getRecipient());
 
-                Content content = new Content(
-                        "text/html",
-                        EmailTemplateBuilder.buildUserConfirmationTemplateFromLog(logEntry));
+                String htmlContent;
+
+                switch (logEntry.getEmailType()) {
+
+                    case USER_CONFIRMATION ->
+                            htmlContent = emailTemplateBuilder
+                                    .buildUserConfirmationTemplateFromLog(logEntry);
+
+                    case ADMIN_NOTIFICATION ->
+                            htmlContent = emailTemplateBuilder
+                                    .buildAdminNotificationTemplateFromLog(logEntry);
+
+                    case CONVERTED_CLIENT ->
+                            htmlContent = emailTemplateBuilder
+                                    .buildConvertedTemplateFromLog(logEntry);
+
+                    default ->
+                            throw new IllegalStateException("Unknown email type");
+                }
+
+                Content content = new Content("text/html", htmlContent);
 
                 Mail mail = new Mail(from, logEntry.getSubject(), to, content);
 
