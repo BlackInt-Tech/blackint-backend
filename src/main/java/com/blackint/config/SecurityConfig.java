@@ -43,7 +43,7 @@ public class SecurityConfig {
 
         http
 
-            // Stateless API (JWT)
+            // Stateless JWT API
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
@@ -54,12 +54,14 @@ public class SecurityConfig {
             .exceptionHandling(exception ->
                     exception.authenticationEntryPoint(authenticationEntryPoint)
             )
-            
+
             // ================= AUTHORIZATION =================
             .authorizeHttpRequests(auth -> auth
 
-                    // ===== AUTH APIs =====
-                    .requestMatchers("/api/auth/**").permitAll()
+                    // ===== AUTH APIs (IMPORTANT FIX) =====
+                    .requestMatchers("/api/auth/**", "/api/v1/auth/**").permitAll()
+
+                    // ===== HEALTH =====
                     .requestMatchers("/", "/health").permitAll()
 
                     // ===== SWAGGER =====
@@ -69,33 +71,45 @@ public class SecurityConfig {
                             "/swagger-ui.html"
                     ).permitAll()
 
-                    // ===== STATIC RESOURCES =====
+                    // ===== STATIC =====
                     .requestMatchers(
                             "/images/**",
                             "/css/**",
                             "/js/**"
                     ).permitAll()
 
-                    .requestMatchers("/api/contacts/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/offerings/**").permitAll()
+                    // ===== CONTACT PUBLIC =====
+                    .requestMatchers("/api/contacts/**", "/api/v1/contacts/**").permitAll()
 
-                    .requestMatchers(HttpMethod.POST, "/api/blogs/**").authenticated()
-                    .requestMatchers(HttpMethod.PUT, "/api/blogs/**").authenticated()
-                    .requestMatchers(HttpMethod.DELETE, "/api/blogs/**").authenticated()
+                    // ===== BLOG PUBLIC =====
+                    .requestMatchers(HttpMethod.GET, "/api/blogs/**", "/api/v1/blogs/**").permitAll()
 
-                    .requestMatchers(HttpMethod.POST, "/api/projects/**").authenticated()
-                    .requestMatchers(HttpMethod.PUT, "/api/projects/**").authenticated()
-                    .requestMatchers(HttpMethod.DELETE, "/api/projects/**").authenticated()
+                    // ===== PROJECT PUBLIC =====
+                    .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/v1/projects/**").permitAll()
 
-                    .requestMatchers(HttpMethod.POST, "/api/offerings/**").authenticated()
-                    .requestMatchers(HttpMethod.PUT, "/api/offerings/**").authenticated()
-                    .requestMatchers(HttpMethod.DELETE, "/api/offerings/**").authenticated()
+                    // ===== OFFERINGS PUBLIC =====
+                    .requestMatchers(HttpMethod.GET, "/api/offerings/**", "/api/v1/offerings/**").permitAll()
 
+                    // ===== BLOG ADMIN =====
+                    .requestMatchers(HttpMethod.POST, "/api/blogs/**", "/api/v1/blogs/**").authenticated()
+                    .requestMatchers(HttpMethod.PUT, "/api/blogs/**", "/api/v1/blogs/**").authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/api/blogs/**", "/api/v1/blogs/**").authenticated()
+
+                    // ===== PROJECT ADMIN =====
+                    .requestMatchers(HttpMethod.POST, "/api/projects/**", "/api/v1/projects/**").authenticated()
+                    .requestMatchers(HttpMethod.PUT, "/api/projects/**", "/api/v1/projects/**").authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/api/projects/**", "/api/v1/projects/**").authenticated()
+
+                    // ===== OFFERINGS ADMIN =====
+                    .requestMatchers(HttpMethod.POST, "/api/offerings/**", "/api/v1/offerings/**").authenticated()
+                    .requestMatchers(HttpMethod.PUT, "/api/offerings/**", "/api/v1/offerings/**").authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/api/offerings/**", "/api/v1/offerings/**").authenticated()
+
+                    // ===== EVERYTHING ELSE =====
                     .anyRequest().authenticated()
             )
 
+            // ===== FILTERS =====
             .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
