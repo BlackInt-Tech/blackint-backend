@@ -2,6 +2,8 @@ package com.blackint.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -76,4 +78,61 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<ApiError> handleAccessDenied(
+                AccessDeniedException ex,
+                HttpServletRequest request) {
+
+        ApiError error = ApiError.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Forbidden")
+                .message("Access denied")
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+        }
+
+        @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+        public ResponseEntity<ApiError> handleBadCredentials(
+                Exception ex,
+                HttpServletRequest request) {
+
+        ApiError error = ApiError.builder()
+                .success(false)
+                .message("Invalid credentials")
+                .error("Unauthorized")
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
+
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ApiError> handleValidationErrors(
+                MethodArgumentNotValidException ex,
+                HttpServletRequest request) {
+
+        String errorMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation error");
+
+        ApiError error = ApiError.builder()
+                .success(false)
+                .message(errorMessage)
+                .error("Validation Error")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
 }

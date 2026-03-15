@@ -42,11 +42,15 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return;
         }
 
-        // ✅ Apply rate limit ONLY to sensitive APIs
-        if (!path.startsWith("/api/auth/login")
-                && !path.startsWith("/api/auth/register")
-                && !path.startsWith("/api/contact")) {
+        if (path.startsWith("/actuator")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
+        // ✅ Apply rate limit to all POST api
+        String method = request.getMethod();
+
+        if (!method.equals("POST")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -63,15 +67,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
             if (currentTime - counter.timestamp > TIME_WINDOW) {
                 counter.timestamp = currentTime;
-                counter.count = 0;
+                counter.count.set(0);
             }
 
-            counter.count++;
+            int requestCount = counter.count.incrementAndGet();
 
-            if (counter.count > MAX_REQUESTS) {
+            if (requestCount > MAX_REQUESTS) {
 
-                log.warn("Rate limit exceeded for IP: {}", ip);
-
+                log.warn("Rate limit exceeded: ip={}, path={}", ip, path);
                 response.setStatus(429);
                 response.setContentType("application/json");
 
@@ -91,7 +94,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private static class RequestCounter {
-        int count = 0;
+
+        java.util.concurrent.atomic.AtomicInteger count =
+                new java.util.concurrent.atomic.AtomicInteger(0);
+
         long timestamp = System.currentTimeMillis();
     }
 }

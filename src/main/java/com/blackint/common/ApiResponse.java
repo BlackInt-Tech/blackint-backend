@@ -44,6 +44,7 @@ public class ApiResponse<T> {
             .success(true)
             .message(message)
             .data(null)
+            .status(200)
             .timestamp(LocalDateTime.now())
             .build();
 }
