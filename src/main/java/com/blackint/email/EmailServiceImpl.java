@@ -87,7 +87,7 @@ public class EmailServiceImpl implements EmailService {
             EmailLog logEntry = EmailLog.builder()
                     .emailType(EmailType.ADMIN_NOTIFICATION)
                     .publicId(contact.getPublicId())
-                    .recipient(contact.getEmail())
+                    .recipient(adminEmail)
                     .subject(subject)
                     .status(EmailStatus.PENDING)
                     .createdAt(LocalDateTime.now())
@@ -95,13 +95,13 @@ public class EmailServiceImpl implements EmailService {
 
                     .firstName(contact.getFirstName())
                     .lastName(contact.getLastName())
+                    .email(contact.getEmail())
                     .company(contact.getCompany())
                     .phone(contact.getPhone())
                     .services(contact.getServices())
                     .budget(contact.getBudget())
                     .projectIdea(contact.getProjectIdea())
                     .message(contact.getMessage())
-
                     .build();
 
             emailLogRepository.save(logEntry);
