@@ -87,7 +87,7 @@ public class EmailServiceImpl implements EmailService {
             EmailLog logEntry = EmailLog.builder()
                     .emailType(EmailType.ADMIN_NOTIFICATION)
                     .publicId(contact.getPublicId())
-                    .recipient(adminEmail)
+                    .recipient(contact.getEmail())
                     .subject(subject)
                     .status(EmailStatus.PENDING)
                     .createdAt(LocalDateTime.now())
