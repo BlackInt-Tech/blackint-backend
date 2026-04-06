@@ -13,7 +13,6 @@ import java.util.Optional;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
-    // BASIC LOOKUPS
 
     Optional<Project> findByPublicId(String publicId);
 

@@ -2,7 +2,11 @@ package com.blackint.repository;
 
 import com.blackint.entity.Offering;
 import com.blackint.entity.OfferingStatus;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -22,5 +26,13 @@ public interface OfferingRepository extends JpaRepository<Offering, UUID> {
     List<Offering> findByStatusAndIsDeletedFalse(OfferingStatus status);
 
     List<Offering> findByIsDeletedFalse();
+
+    @Query("""
+        SELECT o FROM Offering o
+        WHERE o.status = 'PUBLISHED'
+        AND o.isDeleted = false
+        ORDER BY o.createdAt DESC
+    """)
+    List<Offering> findTopPublishedOfferings(Pageable pageable);
 }
 
