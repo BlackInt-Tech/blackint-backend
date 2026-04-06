@@ -1,10 +1,12 @@
 package com.blackint.repository;
 
+import com.blackint.dto.BlogSummaryDTO;
 import com.blackint.entity.*;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,4 +46,19 @@ public interface BlogRepository extends JpaRepository<Blog, UUID> {
         AND b.isDeleted = false
     """)
     Page<Blog> findByTagSlug(String slug, Pageable pageable);
+
+    @Query("""
+        SELECT new com.blackint.dto.BlogSummaryDTO(
+            b.publicId,
+            b.title,
+            b.slug,
+            b.excerpt,
+            b.featuredImage
+        )
+        FROM Blog b
+        WHERE b.status = 'PUBLISHED'
+        AND b.isDeleted = false
+        ORDER BY b.publishedAt DESC
+    """)
+    List<BlogSummaryDTO> findTopBlogs(Pageable pageable);
 }
