@@ -90,6 +90,9 @@ public class SecurityConfig {
                     // ===== OFFERINGS PUBLIC =====
                     .requestMatchers(HttpMethod.GET, "/api/offerings/**", "/api/v1/offerings/**").permitAll()
 
+                    // ===== HOMEPAGE PUBLIC =====
+                    .requestMatchers(HttpMethod.GET, "/api/homepage-data", "/api/v1/homepage-data").permitAll()
+
                     // ===== BLOG ADMIN =====
                     .requestMatchers(HttpMethod.POST, "/api/blogs/**", "/api/v1/blogs/**").authenticated()
                     .requestMatchers(HttpMethod.PUT, "/api/blogs/**", "/api/v1/blogs/**").authenticated()
