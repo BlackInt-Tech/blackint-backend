@@ -2,6 +2,7 @@ package com.blackint.repository;
 
 import com.blackint.entity.Offering;
 import com.blackint.entity.OfferingStatus;
+import com.blackint.entity.OfferingType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,5 +35,10 @@ public interface OfferingRepository extends JpaRepository<Offering, UUID> {
         ORDER BY o.createdAt DESC
     """)
     List<Offering> findTopPublishedOfferings(Pageable pageable);
+
+    List<Offering> findByStatusAndIsDeletedFalseAndOfferingType(
+            OfferingStatus status,
+            OfferingType offeringType
+    );
 }
 

@@ -47,7 +47,9 @@ public class EmailServiceImpl implements EmailService {
                     .lastName(contact.getLastName())
                     .company(contact.getCompany())
                     .phone(contact.getPhone())
-                    .services(contact.getServices())
+                    .serviceType(contact.getServiceType())
+                    .serviceName(contact.getServiceName())
+                    .servicePrice(contact.getServicePrice())
                     .budget(contact.getBudget())
                     .projectIdea(contact.getProjectIdea())
                     .message(contact.getMessage())
@@ -82,7 +84,7 @@ public class EmailServiceImpl implements EmailService {
                             + " "
                             + contact.getLastName()
                             + " | "
-                            + contact.getServices();
+                            + contact.getServiceType();
 
             EmailLog logEntry = EmailLog.builder()
                     .emailType(EmailType.ADMIN_NOTIFICATION)
@@ -98,7 +100,9 @@ public class EmailServiceImpl implements EmailService {
                     .email(contact.getEmail())
                     .company(contact.getCompany())
                     .phone(contact.getPhone())
-                    .services(contact.getServices())
+                    .serviceType(contact.getServiceType())
+                    .serviceName(contact.getServiceName())
+                    .servicePrice(contact.getServicePrice())
                     .budget(contact.getBudget())
                     .projectIdea(contact.getProjectIdea())
                     .message(contact.getMessage())
@@ -143,7 +147,9 @@ public class EmailServiceImpl implements EmailService {
                     .lastName(contact.getLastName())
                     .company(contact.getCompany())
                     .phone(contact.getPhone())
-                    .services(contact.getServices())
+                    .serviceType(contact.getServiceType())
+                    .serviceName(contact.getServiceName())
+                    .servicePrice(contact.getServicePrice())
                     .budget(contact.getBudget())
                     .projectIdea(contact.getProjectIdea())
                     .message(contact.getMessage())

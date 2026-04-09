@@ -19,7 +19,9 @@ public class ContactResponse {
     private String phone;
     private String company;
 
-    private String services;
+    private String serviceType;
+    private String serviceName;
+    private String servicePrice;
     private String budget;
     private String projectIdea;
 

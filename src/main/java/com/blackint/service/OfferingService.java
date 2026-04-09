@@ -4,6 +4,7 @@ import com.blackint.dto.request.OfferingRequest;
 import com.blackint.dto.response.OfferingResponse;
 import com.blackint.entity.Offering;
 import com.blackint.entity.OfferingStatus;
+import com.blackint.entity.OfferingType;
 import com.blackint.exception.ResourceNotFoundException;
 import com.blackint.exception.SlugAlreadyExistsException;
 import com.blackint.mapper.OfferingMapper;
@@ -144,5 +145,17 @@ public class OfferingService {
                 .stream()
                 .map(OfferingMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    public List<OfferingResponse> getByType(String type) {
+
+        return offeringRepository
+                .findByStatusAndIsDeletedFalseAndOfferingType(
+                        OfferingStatus.PUBLISHED,
+                        OfferingType.valueOf(type)
+                )
+                .stream()
+                .map(OfferingMapper::toResponse)
+                .toList();
     }
 }

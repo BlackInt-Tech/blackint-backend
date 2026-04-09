@@ -43,8 +43,9 @@ public class EmailLog {
     private String email;
     private String company;
 
-    @Column(columnDefinition = "TEXT")
-    private String services;
+    private String serviceType;
+    private String serviceName;
+    private String servicePrice;
 
     private String budget;
 

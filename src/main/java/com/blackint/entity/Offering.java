@@ -42,6 +42,11 @@ public class Offering {
 
     private String icon;
     private String featuredImage;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OfferingType offeringType;
+    
     private String price;
 
     @Column(name = "is_featured")

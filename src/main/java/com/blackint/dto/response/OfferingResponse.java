@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class OfferingResponse {
 
     private String publicId;
-
+    private String offeringType;
     private String title;
     private String slug;
     private String shortDescription;

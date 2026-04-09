@@ -33,8 +33,12 @@ public class Contact {
 
     private String company;
 
+    private String serviceType;
+    
     @Column(columnDefinition = "TEXT")
-    private String services;
+    private String serviceName;
+    
+    private String servicePrice;
 
     private String budget;
 

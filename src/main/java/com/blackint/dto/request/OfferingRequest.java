@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 public class OfferingRequest {
 
+    private String offeringType;
     private String title;
     private String slug;
     private String shortDescription;

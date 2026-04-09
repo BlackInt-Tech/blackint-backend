@@ -3,8 +3,6 @@ package com.blackint.service;
 import com.blackint.dto.BlogSummaryDTO;
 import com.blackint.dto.ProjectSummaryDTO;
 import com.blackint.dto.response.*;
-import com.blackint.entity.*;
-import com.blackint.mapper.*;
 import com.blackint.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +17,7 @@ public class HomepageService {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private OfferingRepository offeringRepository;
+    private OfferingService offeringService;
 
     @Autowired
     private BlogRepository blogRepository;
@@ -29,32 +27,30 @@ public class HomepageService {
         HomepageResponse response = new HomepageResponse();
 
         // ================= PROJECTS =================
-        
         List<ProjectSummaryDTO> projects =
                 projectRepository.findFeaturedPublishedProjects();
 
-        // ================= OFFERINGS =================
-        List<Offering> offerings =
-                offeringRepository.findTopPublishedOfferings(
-                        PageRequest.of(0, 15)
-                );
+        // ================= SERVICES =================
+        List<OfferingResponse> services =
+                offeringService.getByType("SERVICE");
+
+        // ================= PACKAGES =================
+        List<OfferingResponse> packages =
+                offeringService.getByType("PACKAGE");
 
         // ================= BLOGS =================
         List<BlogSummaryDTO> blogs =
                 blogRepository.findTopBlogs(PageRequest.of(0, 15));
 
-        response.setInsights(blogs);
+        // ================= BUILD WRAPPER =================
+        OfferingsWrapper offeringsWrapper = OfferingsWrapper.builder()
+                .services(services)
+                .packages(packages)
+                .build();
 
         // ================= SET RESPONSE =================
-
         response.setProjects(projects);
-
-        response.setOfferings(
-                offerings.stream()
-                        .map(OfferingMapper::toResponse)
-                        .toList()
-        );
-
+        response.setOfferings(offeringsWrapper);
         response.setInsights(blogs);
 
         return response;

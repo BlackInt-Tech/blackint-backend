@@ -30,8 +30,14 @@ public class ContactRequest {
     @NotBlank(message = "Company is required")
     private String company;
 
-    @NotEmpty(message = "Select at least one service")
-    private List<String> services;
+
+    @NotBlank(message = "Service type is required")
+    private String serviceType;
+
+    @NotBlank(message = "Service name is required")
+    private String serviceName;
+
+    private String servicePrice;
 
     @NotBlank(message = "Budget is required")
     private String budget;

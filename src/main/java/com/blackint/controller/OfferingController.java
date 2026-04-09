@@ -69,6 +69,13 @@ public class OfferingController {
         return ApiResponse.success(service.getPublished());
     }
 
+    @GetMapping("/getByType/{type}")
+    public ApiResponse<List<OfferingResponse>> getByType(
+            @PathVariable String type
+    ) {
+        return ApiResponse.success(service.getByType(type));
+    }
+
     @GetMapping("/getBySlug/{slug}")
     public ApiResponse<OfferingResponse> getBySlug(
             @PathVariable String slug

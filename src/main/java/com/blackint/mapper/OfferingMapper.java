@@ -4,7 +4,7 @@ import com.blackint.dto.request.OfferingRequest;
 import com.blackint.dto.response.OfferingResponse;
 import com.blackint.entity.Offering;
 import com.blackint.entity.OfferingStatus;
-
+import com.blackint.entity.OfferingType;
 import java.time.LocalDateTime;
 
 public class OfferingMapper {
@@ -12,6 +12,10 @@ public class OfferingMapper {
     public static Offering toEntity(OfferingRequest request) {
 
         return Offering.builder()
+                .offeringType(
+                    request.getOfferingType() != null 
+                    ? OfferingType.valueOf(request.getOfferingType()) 
+                    : OfferingType.SERVICE)
                 .title(request.getTitle())
                 .slug(request.getSlug())
                 .shortDescription(request.getShortDescription())
@@ -32,6 +36,7 @@ public class OfferingMapper {
     public static OfferingResponse toResponse(Offering service) {
 
         return OfferingResponse.builder()
+                .offeringType(service.getOfferingType().name())
                 .publicId(service.getPublicId())
                 .title(service.getTitle())
                 .slug(service.getSlug())
