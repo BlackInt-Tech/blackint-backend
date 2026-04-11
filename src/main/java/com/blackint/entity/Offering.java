@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -35,7 +36,13 @@ public class Offering {
     @Column(nullable = false, unique = true)
     private String slug;
 
-    private String shortDescription;
+    @ElementCollection
+    @CollectionTable(
+        name = "offering_short_descriptions",
+        joinColumns = @JoinColumn(name = "publicId")
+    )
+    @Column(name = "description")
+    private List<String> shortDescription;
 
     @Column(columnDefinition = "TEXT")
     private String fullContent;

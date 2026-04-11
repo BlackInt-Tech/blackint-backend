@@ -3,8 +3,6 @@ package com.blackint.dto.request;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class ContactRequest {
 
@@ -31,24 +29,17 @@ public class ContactRequest {
     private String company;
 
 
-    @NotBlank(message = "Service type is required")
-    private String serviceType;
+    @NotBlank(message = "Offering type is required")
+    private String offeringType;
 
-    @NotBlank(message = "Service name is required")
-    private String serviceName;
+    @NotBlank(message = "Offering name is required")
+    private String offeringName;
 
-    private String servicePrice;
-
-    @NotBlank(message = "Budget is required")
-    private String budget;
+    @NotBlank(message = "Offering price is required")
+    private String offeringPrice;
 
     @NotBlank(message = "Project idea is required")
     @Size(min = 10, max = 3000)
     private String projectIdea;
 
-    @NotBlank(message = "Message is required")
-    @Size(min = 10, max = 2000)
-    private String message;
-
-    
 }

@@ -3,6 +3,7 @@ package com.blackint.controller;
 import com.blackint.common.ApiResponse;
 import com.blackint.dto.request.OfferingRequest;
 import com.blackint.dto.response.OfferingResponse;
+import com.blackint.dto.response.OfferingsWrapper;
 import com.blackint.service.OfferingService;
 
 import lombok.RequiredArgsConstructor;
@@ -65,8 +66,8 @@ public class OfferingController {
 
     // ================= PUBLIC =================
     @GetMapping("/getPublished")
-    public ApiResponse<List<OfferingResponse>> getPublished() {
-        return ApiResponse.success(service.getPublished());
+    public ApiResponse<OfferingsWrapper> getPublished() {
+        return ApiResponse.success(service.getGroupedOfferings());
     }
 
     @GetMapping("/getByType/{type}")

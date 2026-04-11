@@ -2,6 +2,7 @@ package com.blackint.service;
 
 import com.blackint.dto.request.OfferingRequest;
 import com.blackint.dto.response.OfferingResponse;
+import com.blackint.dto.response.OfferingsWrapper;
 import com.blackint.entity.Offering;
 import com.blackint.entity.OfferingStatus;
 import com.blackint.entity.OfferingType;
@@ -120,13 +121,26 @@ public class OfferingService {
 
     // ================= PUBLIC =================
 
-    public List<OfferingResponse> getPublished() {
+    public OfferingsWrapper getGroupedOfferings() {
 
-        return offeringRepository.findByStatusAndIsDeletedFalse(OfferingStatus.PUBLISHED)
-                .stream()
-                .map(OfferingMapper::toResponse)
-                .collect(Collectors.toList());
-    }
+    List<Offering> all =
+            offeringRepository.findByStatusAndIsDeletedFalse(OfferingStatus.PUBLISHED);
+
+    List<OfferingResponse> services = all.stream()
+            .filter(o -> o.getOfferingType().name().equals("SERVICE"))
+            .map(OfferingMapper::toResponse)
+            .toList();
+
+    List<OfferingResponse> packages = all.stream()
+            .filter(o -> o.getOfferingType().name().equals("PACKAGE"))
+            .map(OfferingMapper::toResponse)
+            .toList();
+
+    return OfferingsWrapper.builder()
+            .services(services)
+            .packages(packages)
+            .build();
+}
 
     public OfferingResponse getBySlug(String slug) {
 

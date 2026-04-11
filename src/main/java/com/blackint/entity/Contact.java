@@ -33,21 +33,16 @@ public class Contact {
 
     private String company;
 
-    private String serviceType;
-    
-    @Column(columnDefinition = "TEXT")
-    private String serviceName;
-    
-    private String servicePrice;
+    private String offeringType;
 
-    private String budget;
+    @Column(columnDefinition = "TEXT")
+    private String offeringName;
+
+    private String offeringPrice;
 
     @Column(columnDefinition = "TEXT")
     @Size(min = 20, message = "Project idea must contain at least 20 characters")
     private String projectIdea;
-
-    @Column(columnDefinition = "TEXT")
-    private String message;
 
     private String source;
     private String subject;

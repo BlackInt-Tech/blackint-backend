@@ -108,7 +108,7 @@ public class EmailTemplateBuilder {
 
     public String buildUserConfirmationTemplate(Contact contact) {
 
-        String servicesHtml = formatServices(contact.getServiceType(), contact.getServiceName(), contact.getServicePrice());
+        String servicesHtml = formatServices(contact.getOfferingType(), contact.getOfferingName(), contact.getOfferingPrice());
 
         return """
         <!DOCTYPE html>
@@ -341,7 +341,7 @@ ADMIN NOTIFICATION TEMPLATE
 
 public String buildAdminNotificationTemplate(Contact contact) {
 
-    String servicesHtml = formatServices(contact.getServiceType(), contact.getServiceName(), contact.getServicePrice());
+    String servicesHtml = formatServices(contact.getOfferingType(), contact.getOfferingName(), contact.getOfferingPrice());
 
     return """
     <!DOCTYPE html>
@@ -444,7 +444,7 @@ CONVERTED CLIENT TEMPLATE
 
 public String buildConvertedTemplate(Contact contact) {
 
-    String servicesHtml = formatServices(contact.getServiceType(), contact.getServiceName(), contact.getServicePrice());
+    String servicesHtml = formatServices(contact.getOfferingType(), contact.getOfferingName(), contact.getOfferingPrice());
 
     return """
     <!DOCTYPE html>
@@ -549,12 +549,10 @@ public String buildConvertedTemplate(Contact contact) {
                 .email(log.getRecipient())
                 .phone(log.getPhone())
                 .company(log.getCompany())
-                .serviceType(log.getServiceType())
-                .serviceName(log.getServiceName())
-                .servicePrice(log.getServicePrice())
-                .budget(log.getBudget())
+                .offeringType(log.getOfferingType())
+                .offeringName(log.getOfferingName())
+                .offeringPrice(log.getOfferingPrice())    
                 .projectIdea(log.getProjectIdea())
-                .message(log.getMessage())
                 .build();
 
         return buildUserConfirmationTemplate(contact);
@@ -568,12 +566,10 @@ public String buildConvertedTemplate(Contact contact) {
                 .email(log.getRecipient())
                 .phone(log.getPhone())
                 .company(log.getCompany())
-                .serviceType(log.getServiceType())
-                .serviceName(log.getServiceName())
-                .servicePrice(log.getServicePrice())
-                .budget(log.getBudget())
+                .offeringType(log.getOfferingType())
+                .offeringName(log.getOfferingName())
+                .offeringPrice(log.getOfferingPrice())
                 .projectIdea(log.getProjectIdea())
-                .message(log.getMessage())
                 .publicId(log.getPublicId())
                 .build();
 
@@ -589,12 +585,10 @@ public String buildConvertedTemplate(Contact contact) {
                 .email(log.getRecipient())
                 .phone(log.getPhone())
                 .company(log.getCompany())
-                .serviceType(log.getServiceType())
-                .serviceName(log.getServiceName())
-                .servicePrice(log.getServicePrice())
-                .budget(log.getBudget())
+                .offeringType(log.getOfferingType())
+                .offeringName(log.getOfferingName())
+                .offeringPrice(log.getOfferingPrice())
                 .projectIdea(log.getProjectIdea())
-                .message(log.getMessage())
                 .build();
 
         return buildConvertedTemplate(contact);
