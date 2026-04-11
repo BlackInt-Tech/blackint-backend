@@ -39,7 +39,10 @@ public class Offering {
     @ElementCollection
     @CollectionTable(
         name = "offering_short_descriptions",
-        joinColumns = @JoinColumn(name = "offering_id")
+        joinColumns = @JoinColumn(
+            name = "offering_id",
+            referencedColumnName = "public_id"
+        )
     )
     @Column(name = "description")
     private List<String> shortDescription;
