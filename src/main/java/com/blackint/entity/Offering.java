@@ -27,7 +27,7 @@ public class Offering {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(name = "public_id", nullable = false, unique = true, length = 20)
     private String publicId;
 
     @Column(nullable = false)
