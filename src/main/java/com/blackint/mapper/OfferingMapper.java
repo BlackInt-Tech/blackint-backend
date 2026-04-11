@@ -7,24 +7,26 @@ import com.blackint.entity.OfferingStatus;
 import com.blackint.entity.OfferingType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class OfferingMapper {
 
+    // ================= TO ENTITY =================
     public static Offering toEntity(OfferingRequest request) {
 
         return Offering.builder()
                 .title(request.getTitle())
                 .slug(request.getSlug())
-                .shortDescription(request.getShortDescription())
+                .shortDescription(request.getShortDescription()) // List<String>
                 .fullContent(request.getFullContent())
                 .icon(request.getIcon())
                 .featuredImage(request.getFeaturedImage())
                 .price(request.getPrice())
 
                 .offeringType(
-                        OfferingType.valueOf(
-                                request.getOfferingType().toUpperCase()
-                        )
+                        request.getOfferingType() != null
+                                ? OfferingType.valueOf(request.getOfferingType().toUpperCase())
+                                : null
                 )
 
                 .isFeatured(request.getIsFeatured())
@@ -38,24 +40,37 @@ public class OfferingMapper {
                 .build();
     }
 
-    public static OfferingResponse toResponse(Offering response) {
+    // ================= TO RESPONSE =================
+    public static OfferingResponse toResponse(Offering offering) {
 
         return OfferingResponse.builder()
-                .publicId(response.getPublicId())
-                .title(response.getTitle())
-                .slug(response.getSlug())
-                .shortDescription(response.getShortDescription())
-                .fullContent(response.getFullContent())
-                .icon(response.getIcon())
-                .featuredImage(response.getFeaturedImage())
-                .price(response.getPrice())
-                .offeringType(response.getOfferingType().name())
-                .isFeatured(response.getIsFeatured())
-                .status(response.getStatus())
-                .seoTitle(response.getSeoTitle())
-                .seoDescription(response.getSeoDescription())
-                .createdAt(response.getCreatedAt())
-                .publishedAt(response.getPublishedAt())
+                .publicId(offering.getPublicId())
+                .title(offering.getTitle())
+                .slug(offering.getSlug())
+
+                .shortDescription(
+                        offering.getShortDescription() != null
+                                ? offering.getShortDescription()
+                                : List.of()
+                )
+
+                .fullContent(offering.getFullContent())
+                .icon(offering.getIcon())
+                .featuredImage(offering.getFeaturedImage())
+                .price(offering.getPrice())
+
+                .offeringType(
+                        offering.getOfferingType() != null
+                                ? offering.getOfferingType().name()
+                                : null
+                )
+
+                .isFeatured(offering.getIsFeatured())
+                .status(offering.getStatus())
+                .seoTitle(offering.getSeoTitle())
+                .seoDescription(offering.getSeoDescription())
+                .createdAt(offering.getCreatedAt())
+                .publishedAt(offering.getPublishedAt())
                 .build();
     }
 }
