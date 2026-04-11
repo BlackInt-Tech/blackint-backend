@@ -27,7 +27,7 @@ public class Offering {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(name = "public_id", nullable = false, unique = true, length = 20)
     private String publicId;
 
     @Column(nullable = false)
@@ -39,7 +39,10 @@ public class Offering {
     @ElementCollection
     @CollectionTable(
         name = "offering_short_descriptions",
-        joinColumns = @JoinColumn(name = "offering_id")
+        joinColumns = @JoinColumn(
+            name = "offering_id",
+            referencedColumnName = "public_id"
+        )
     )
     @Column(name = "description")
     private List<String> shortDescription;
