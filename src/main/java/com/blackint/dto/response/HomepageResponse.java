@@ -8,8 +8,9 @@ import com.blackint.dto.ProjectSummaryDTO;
 public class HomepageResponse {
 
     private List<ProjectSummaryDTO> projects;
-    private List<OfferingResponse> offerings;
+    private OfferingsWrapper offerings;
     private List<BlogSummaryDTO> insights;
+    
 
     public List<ProjectSummaryDTO> getProjects() {
         return projects;
@@ -19,11 +20,11 @@ public class HomepageResponse {
         this.projects = projects;
     }
 
-    public List<OfferingResponse> getOfferings() {
+    public OfferingsWrapper getOfferings() {
         return offerings;
     }
 
-    public void setOfferings(List<OfferingResponse> offerings) {
+    public void setOfferings(OfferingsWrapper offerings) {
         this.offerings = offerings;
     }
 
@@ -34,4 +35,5 @@ public class HomepageResponse {
     public void setInsights(List<BlogSummaryDTO> insights) {
         this.insights = insights;
     }
+
 }

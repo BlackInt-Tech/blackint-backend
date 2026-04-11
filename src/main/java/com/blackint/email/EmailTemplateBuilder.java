@@ -63,28 +63,43 @@ public class EmailTemplateBuilder {
 
     // ================= SERVICE FORMATTER =================
 
-    private static String formatServices(String services) {
+    private static String formatServices(String type, String name, String price) {
 
-        if (services == null || services.isBlank()) {
+        if ((name == null || name.isBlank()) &&
+            (type == null || type.isBlank()) &&
+            (price == null || price.isBlank())) {
+
             return "<div style='color:#777;'>No services selected</div>";
         }
 
-        String[] servicesArray = services.split(",");
-
         StringBuilder builder = new StringBuilder();
 
-        for (String service : servicesArray) {
-
+        if (name != null && !name.isBlank()) {
             builder.append("""
                 <div style="margin-bottom:6px;">
                     • <span style="color:#FFFFFF;">%s</span>
                 </div>
-            """.formatted(service.trim()));
+            """.formatted(name.trim()));
+        }
+
+        if (type != null && !type.isBlank()) {
+            builder.append("""
+                <div style="margin-bottom:6px;">
+                    • <span style="color:#FFFFFF;">Type: %s</span>
+                </div>
+            """.formatted(type.trim()));
+        }
+
+        if (price != null && !price.isBlank()) {
+            builder.append("""
+                <div style="margin-bottom:6px;">
+                    • <span style="color:#FFFFFF;">Price: %s</span>
+                </div>
+            """.formatted(price.trim()));
         }
 
         return builder.toString();
     }
-
     /*
     =========================================
     USER CONFIRMATION TEMPLATE
@@ -93,7 +108,7 @@ public class EmailTemplateBuilder {
 
     public String buildUserConfirmationTemplate(Contact contact) {
 
-        String servicesHtml = formatServices(contact.getServices());
+        String servicesHtml = formatServices(contact.getOfferingType(), contact.getOfferingName(), contact.getOfferingPrice());
 
         return """
         <!DOCTYPE html>
@@ -326,7 +341,7 @@ ADMIN NOTIFICATION TEMPLATE
 
 public String buildAdminNotificationTemplate(Contact contact) {
 
-    String servicesHtml = formatServices(contact.getServices());
+    String servicesHtml = formatServices(contact.getOfferingType(), contact.getOfferingName(), contact.getOfferingPrice());
 
     return """
     <!DOCTYPE html>
@@ -429,7 +444,7 @@ CONVERTED CLIENT TEMPLATE
 
 public String buildConvertedTemplate(Contact contact) {
 
-    String servicesHtml = formatServices(contact.getServices());
+    String servicesHtml = formatServices(contact.getOfferingType(), contact.getOfferingName(), contact.getOfferingPrice());
 
     return """
     <!DOCTYPE html>
@@ -534,10 +549,10 @@ public String buildConvertedTemplate(Contact contact) {
                 .email(log.getRecipient())
                 .phone(log.getPhone())
                 .company(log.getCompany())
-                .services(log.getServices())
-                .budget(log.getBudget())
+                .offeringType(log.getOfferingType())
+                .offeringName(log.getOfferingName())
+                .offeringPrice(log.getOfferingPrice())    
                 .projectIdea(log.getProjectIdea())
-                .message(log.getMessage())
                 .build();
 
         return buildUserConfirmationTemplate(contact);
@@ -551,10 +566,10 @@ public String buildConvertedTemplate(Contact contact) {
                 .email(log.getRecipient())
                 .phone(log.getPhone())
                 .company(log.getCompany())
-                .services(log.getServices())
-                .budget(log.getBudget())
+                .offeringType(log.getOfferingType())
+                .offeringName(log.getOfferingName())
+                .offeringPrice(log.getOfferingPrice())
                 .projectIdea(log.getProjectIdea())
-                .message(log.getMessage())
                 .publicId(log.getPublicId())
                 .build();
 
@@ -570,10 +585,10 @@ public String buildConvertedTemplate(Contact contact) {
                 .email(log.getRecipient())
                 .phone(log.getPhone())
                 .company(log.getCompany())
-                .services(log.getServices())
-                .budget(log.getBudget())
+                .offeringType(log.getOfferingType())
+                .offeringName(log.getOfferingName())
+                .offeringPrice(log.getOfferingPrice())
                 .projectIdea(log.getProjectIdea())
-                .message(log.getMessage())
                 .build();
 
         return buildConvertedTemplate(contact);

@@ -5,9 +5,7 @@ import com.blackint.dto.response.ContactResponse;
 import com.blackint.entity.Contact;
 import com.blackint.entity.LeadStatus;
 import com.blackint.utils.IdGenerator;
-
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
 
 public class ContactMapper {
 
@@ -23,11 +21,10 @@ public class ContactMapper {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .company(request.getCompany())
-                .services(request.getServices() != null
-                        ? String.join(", ", request.getServices()): null)
-                .budget(request.getBudget())
+                .offeringType(request.getOfferingType())
+                .offeringName(request.getOfferingName())
+                .offeringPrice(request.getOfferingPrice())
                 .projectIdea(request.getProjectIdea())
-                .message(request.getMessage())
                 .status(LeadStatus.NEW)
                 .source(source != null ? source : "WEBSITE")
                 .ipAddress(ip)
@@ -45,10 +42,10 @@ public class ContactMapper {
                 .email(contact.getEmail())
                 .phone(contact.getPhone())
                 .company(contact.getCompany())
-                .services(contact.getServices())
-                .budget(contact.getBudget())
+                .offeringType(contact.getOfferingType())
+                .offeringName(contact.getOfferingName())
+                .offeringPrice(contact.getOfferingPrice())
                 .projectIdea(contact.getProjectIdea())
-                .message(contact.getMessage())
                 .status(contact.getStatus())
                 .source(contact.getSource())
                 .createdAt(contact.getCreatedAt())

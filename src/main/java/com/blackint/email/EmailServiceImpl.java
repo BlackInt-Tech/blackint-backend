@@ -47,11 +47,10 @@ public class EmailServiceImpl implements EmailService {
                     .lastName(contact.getLastName())
                     .company(contact.getCompany())
                     .phone(contact.getPhone())
-                    .services(contact.getServices())
-                    .budget(contact.getBudget())
+                    .offeringType(contact.getOfferingType())
+                    .offeringName(contact.getOfferingName())
+                    .offeringPrice(contact.getOfferingPrice())
                     .projectIdea(contact.getProjectIdea())
-                    .message(contact.getMessage())
-
                     .build();
 
             emailLogRepository.save(logEntry);
@@ -82,7 +81,7 @@ public class EmailServiceImpl implements EmailService {
                             + " "
                             + contact.getLastName()
                             + " | "
-                            + contact.getServices();
+                            + contact.getOfferingName();
 
             EmailLog logEntry = EmailLog.builder()
                     .emailType(EmailType.ADMIN_NOTIFICATION)
@@ -92,16 +91,15 @@ public class EmailServiceImpl implements EmailService {
                     .status(EmailStatus.PENDING)
                     .createdAt(LocalDateTime.now())
                     .retryCount(0)
-
                     .firstName(contact.getFirstName())
                     .lastName(contact.getLastName())
                     .email(contact.getEmail())
                     .company(contact.getCompany())
                     .phone(contact.getPhone())
-                    .services(contact.getServices())
-                    .budget(contact.getBudget())
+                    .offeringType(contact.getOfferingType())
+                    .offeringName(contact.getOfferingName())
+                    .offeringPrice(contact.getOfferingPrice())
                     .projectIdea(contact.getProjectIdea())
-                    .message(contact.getMessage())
                     .build();
 
             emailLogRepository.save(logEntry);
@@ -138,16 +136,14 @@ public class EmailServiceImpl implements EmailService {
                     .status(EmailStatus.PENDING)
                     .createdAt(LocalDateTime.now())
                     .retryCount(0)
-
                     .firstName(contact.getFirstName())
                     .lastName(contact.getLastName())
                     .company(contact.getCompany())
                     .phone(contact.getPhone())
-                    .services(contact.getServices())
-                    .budget(contact.getBudget())
+                    .offeringType(contact.getOfferingType())
+                    .offeringName(contact.getOfferingName())
+                    .offeringPrice(contact.getOfferingPrice())
                     .projectIdea(contact.getProjectIdea())
-                    .message(contact.getMessage())
-
                     .build();
 
             emailLogRepository.save(logEntry);

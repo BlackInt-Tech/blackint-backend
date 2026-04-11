@@ -11,23 +11,17 @@ import java.time.LocalDateTime;
 public class ContactResponse {
 
     private String publicId;
-
     private String firstName;
     private String lastName;
-
     private String email;
     private String phone;
     private String company;
-
-    private String services;
-    private String budget;
+    private String offeringType;
+    private String offeringName;
+    private String offeringPrice;
     private String projectIdea;
-
-    private String message;
-
     private LeadStatus status;
     private String source;
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

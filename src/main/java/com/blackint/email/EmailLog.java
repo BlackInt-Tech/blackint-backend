@@ -42,17 +42,12 @@ public class EmailLog {
     private String phone;
     private String email;
     private String company;
-
-    @Column(columnDefinition = "TEXT")
-    private String services;
-
-    private String budget;
+    private String offeringType;
+    private String offeringName;
+    private String offeringPrice;
 
     @Column(columnDefinition = "TEXT")
     private String projectIdea;
-
-    @Column(columnDefinition = "TEXT")
-    private String message;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -4,6 +4,7 @@ import com.blackint.entity.OfferingStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -13,22 +14,18 @@ import java.time.LocalDateTime;
 public class OfferingResponse {
 
     private String publicId;
-
     private String title;
     private String slug;
-    private String shortDescription;
+    private List<String> shortDescription;
     private String fullContent;
-
     private String icon;
     private String featuredImage;
     private String price;
-
+    private String offeringType;
     private Boolean isFeatured;
     private OfferingStatus status;
-
     private String seoTitle;
     private String seoDescription;
-
     private LocalDateTime createdAt;
     private LocalDateTime publishedAt;
 }
